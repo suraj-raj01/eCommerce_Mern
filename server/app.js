@@ -29,6 +29,7 @@ mongoose.connect(Database, {
 // Import routes
 const roleRoute = require("./routes/authentication/roles");
 const permissionRoute = require("./routes/authentication/permission");
+const userRoute = require("./routes/authentication/users");
 
 // Root route
 app.get("/", (req, res) => {
@@ -38,6 +39,7 @@ app.get("/", (req, res) => {
 // Mount routes
 app.use("/api/roles", roleRoute); 
 app.use("/api/permission", permissionRoute); 
+app.use("/api/users", userRoute); 
 
 // Start the server
 app.listen(PORT, () => {
