@@ -99,7 +99,7 @@ export function DataTable<TData, TValue>({
       if (onSearch) {
         onSearch(globalFilter)
       }
-    }, 500)
+    }, 1000)
     return () => clearTimeout(timeout)
   }, [globalFilter, onSearch])
 

@@ -54,7 +54,7 @@ const data = {
         },
         {
           title: "Users",
-          url: "#",
+          url: "/dashboard/user",
         },
       ],
     },

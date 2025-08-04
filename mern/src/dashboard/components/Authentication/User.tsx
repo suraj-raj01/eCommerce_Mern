@@ -13,48 +13,67 @@ import { Trash, Edit, MoreHorizontal } from 'lucide-react'
 import Swal from 'sweetalert2'
 import { Skeleton } from '../../../components/ui/skeleton'
 
-type Roles = {
+type Users = {
   id: string
   name: string
-  permissions: []
+  email: string
+  password: string
+  profile: string
   roleId: string
 }
 
 
-export default function Roles() {
-  const [roles, setRoles] = useState<Roles[]>([])
+export default function User() {
+  const [users, setUser] = useState<Users[]>([])
+  const [roles, setRole] = useState<Users[]>([])
   const [page, setPage] = useState(1)
   const [pageCount, setPageCount] = useState(1)
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState<string>('')
 
-  const api =  'http://localhost:8000/api'
+  const api = 'http://localhost:8000/api'
 
-  const fetchRoles = async () => {
+  const fetchUser = async () => {
     try {
       setLoading(true)
       let response
       if (searchQuery) {
-        response = await axios.post(`${api}/roles/searchrole/${searchQuery}`)
-        setRoles(response?.data?.data || [])
+        response = await axios.post(`${api}/users/searchuser/${searchQuery}`)
+        setUser(response?.data?.data || [])
         // console.log(response.data,"search data");
       } else {
-        response = await axios.get(`${api}/roles/getrole?page=${page}&limit=3`)
-        setRoles(response?.data?.data || [])
+        response = await axios.get(`${api}/users/getuser?page=${page}&limit=3`)
+        setUser(response?.data?.data || [])
         setPage(response.data.currentPage)
         setPageCount(response.data.pageCount)
-        console.log("roles data", response.data)
+        // console.log("users data", response.data)
       }
       const { data } = response
       setPageCount(data.totalPages || 1)
     } catch (error) {
-      console.error('Error fetching roles:', error)
+      console.error('Error fetching users:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const fetchRoles = async () => {
+    try {
+      setLoading(true)
+      const response = await axios.get(`${api}/roles/getrole`)
+      setRole(response?.data?.data || [])
+      setPage(response.data.currentPage)
+      setPageCount(response.data.pageCount)
+      console.log("users data", response.data.data)
+    } catch (error) {
+      console.error('Error fetching users:', error)
     } finally {
       setLoading(false)
     }
   }
 
   useEffect(() => {
+    fetchUser();
     fetchRoles();
   }, [page, searchQuery])
 
@@ -66,7 +85,7 @@ export default function Roles() {
         icon: "success",
         draggable: true
       });
-      fetchRoles();
+      fetchUser();
     } catch (error) {
       console.error('Error deleting permission:', error)
       alert('Failed to delete Role. Please try again.')
@@ -74,10 +93,47 @@ export default function Roles() {
   }
 
 
-  const columns: ColumnDef<Roles>[] = [
+  const columns: ColumnDef<Users>[] = [
     {
-      accessorKey: 'role',
-      header: "Role Name"
+      accessorKey: 'name',
+      header: "User Name"
+    },
+    {
+      accessorKey: 'email',
+      header: "User Email"
+    },
+    {
+      accessorKey: 'roleId',
+      header: "Role Name",
+      cell: ({ row }) => {
+        const roles = row.original.roleId;
+        if (!Array.isArray(roles)) return null;
+        return (
+          <div className="flex gap-1">
+            {roles.map((item, index) => (
+              <section key={index} className='shadow-md bg-accent pt-1 pb-1 pl-2 pr-2 rounded-md'>{item.role}</section>
+            ))}
+          </div>
+        );
+      }
+    },
+    {
+      header: "Assign Role",
+      cell: ({ row }) => {
+        return (
+          <section>
+            <select name="" id="">
+              {roles.map((item,index)=>{
+                return(
+                  <section key={index}>
+                  <option value=""></option>
+                  </section>
+                )
+              })}
+            </select>
+          </section>
+        )
+      }
     },
     {
       header: "Action",
@@ -130,9 +186,9 @@ export default function Roles() {
           ) : (
             <>
               <div>
-                <h1 className="text-3xl font-bold tracking-tight">Roles</h1>
+                <h1 className="text-3xl font-bold tracking-tight">Users</h1>
                 <p className="text-muted-foreground">
-                  Manage and track all the roles
+                  Manage and track all the users
                 </p>
               </div>
             </>
@@ -149,7 +205,7 @@ export default function Roles() {
 
       <DataTable
         columns={columns}
-        data={roles}
+        data={users}
         pageCount={pageCount}
         currentPage={page}
         onPageChange={setPage}

@@ -6,6 +6,8 @@ import DashboardLayout from "./dashboard/DashboardLayout"
 import DashboardHome from "./dashboard/components/DashboardHome"
 import Roles from "./dashboard/components/Authentication/Roles"
 import Permission from "./dashboard/components/Authentication/Permission"
+import LoginPage from "./dashboard/components/Authentication/Users/Login"
+import User from "./dashboard/components/Authentication/User"
 const App = () => {
   return (
     <main>
@@ -22,6 +24,8 @@ const App = () => {
           <Route path="home" element={<DashboardHome/>}/>
           <Route path="roles" element={<Roles/>}/>
           <Route path="permission" element={<Permission/>}/>
+          <Route path="user" element={<User/>}/>
+          <Route path="login" element={<LoginPage/>}/>
         </Route>
       </Routes>
       </BrowserRouter>
