@@ -12,9 +12,20 @@ import { Button } from '../../../components/ui/button'
 import { Trash, Edit, MoreHorizontal } from 'lucide-react'
 import Swal from 'sweetalert2'
 import { Skeleton } from '../../../components/ui/skeleton'
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "../../../components/ui/dialog"
+import { Input } from "../../../components/ui/input"
+import { Label } from "../../../components/ui/label"
 
 type Roles = {
-  id: string
+  _id: string
   name: string
   permissions: []
   roleId: string
@@ -27,6 +38,7 @@ export default function Roles() {
   const [pageCount, setPageCount] = useState(1)
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState<string>('')
+  const [input, setInput] = useState('')
 
   const api =  'http://localhost:8000/api'
 
@@ -58,9 +70,28 @@ export default function Roles() {
     fetchRoles();
   }, [page, searchQuery])
 
+  const handleInput = async (e: any) => {
+    console.log(e.target.value, "input value");
+    setInput(e.target.value)
+  }
+
+  const createRole = async() => {
+    try {
+      const response = await axios.post(`${api}/roles/createrole`, { role: input, permissionId: [] });
+      Swal.fire({
+        title: response.data.message || "Role Created Successfully",
+        icon: "success",
+        draggable: true
+      });
+      fetchRoles()
+    } catch (error) {
+      console.error('Error Creating permission:', error)
+    }
+  }
+
   const deleteRole = async (id: any) => {
     try {
-      await axios.delete(`${api}/vendor/role/${id}`)
+      await axios.delete(`${api}/roles/deleterole/${id}`)
       Swal.fire({
         title: "Role Deleted Successfully",
         icon: "success",
@@ -101,7 +132,7 @@ export default function Roles() {
                   Edit role
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  onClick={() => deleteRole(item.id)}
+                  onClick={() => deleteRole(item._id)}
                 >
                   <Trash className="mr-2 h-4 w-4" />
                   Delete
@@ -141,9 +172,41 @@ export default function Roles() {
         {loading ? (
           <Skeleton className="h-10 w-32" />
         ) : (
-          <Button>
-            Create New Role
-          </Button>
+           <Dialog>
+            <DialogTrigger asChild>
+              <Button variant="outline">Create new role</Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-md">
+              <DialogHeader>
+                <DialogTitle>Create role*</DialogTitle>
+                {/* <DialogDescription>
+                  Anyone who has this link will be able to view this.
+                </DialogDescription> */}
+              </DialogHeader>
+              <div className="flex items-center gap-2">
+                <div className="grid flex-1 gap-2">
+                  <Label htmlFor="link" className="sr-only">
+                    Link
+                  </Label>
+                  <Input
+                    id="link"
+                    placeholder='enter role ...'
+                    onChange={handleInput}
+                  />
+                </div>
+              </div>
+              <DialogFooter className="sm:justify-start">
+                <DialogClose asChild>
+                  <Button type="button" variant="secondary">
+                    Close
+                  </Button>
+                </DialogClose>
+                <Button type="button" variant='default' onClick={createRole}>
+                  Submit
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         )}
       </div>
 

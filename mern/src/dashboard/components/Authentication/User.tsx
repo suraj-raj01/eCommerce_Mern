@@ -9,11 +9,31 @@ import {
   DropdownMenuTrigger,
 } from "../../../components/ui/dropdown-menu"
 import { Button } from '../../../components/ui/button'
-import { Trash, Edit, MoreHorizontal } from 'lucide-react'
+import { Trash, Edit, MoreHorizontal, UserCircle } from 'lucide-react'
 import Swal from 'sweetalert2'
 import { Skeleton } from '../../../components/ui/skeleton'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../../components/ui/select";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "../../../components/ui/dialog"
+import { Input } from "../../../components/ui/input"
+import { Label } from "../../../components/ui/label"
 
 type Users = {
+  _id(_id: any): void
+  role: string
   id: string
   name: string
   email: string
@@ -30,6 +50,13 @@ export default function User() {
   const [pageCount, setPageCount] = useState(1)
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState<string>('')
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+    profile: '',
+    roleId: '',
+  });
 
   const api = 'http://localhost:8000/api'
 
@@ -77,9 +104,9 @@ export default function User() {
     fetchRoles();
   }, [page, searchQuery])
 
-  const deleteRole = async (id: any) => {
+  const deleteUser = async (id: any) => {
     try {
-      await axios.delete(`${api}/vendor/role/${id}`)
+      await axios.delete(`${api}/users/deleteuser/${id}`)
       Swal.fire({
         title: "Role Deleted Successfully",
         icon: "success",
@@ -89,6 +116,40 @@ export default function User() {
     } catch (error) {
       console.error('Error deleting permission:', error)
       alert('Failed to delete Role. Please try again.')
+    }
+  }
+
+  const handleSearch = (query: string) => {
+    setSearchQuery(query)
+  }
+
+  const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleRoleChange = (value: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      roleId: value,
+    }));
+  };
+
+
+  const createRole = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const response = await axios.post(`${api}/roles/createrole`, formData);
+      Swal.fire({
+        title: response.data.message || "Role Created Successfully",
+        icon: "success",
+        draggable: true
+      });
+    } catch (error) {
+      console.error('Error Creating permission:', error)
     }
   }
 
@@ -118,24 +179,6 @@ export default function User() {
       }
     },
     {
-      header: "Assign Role",
-      cell: ({ row }) => {
-        return (
-          <section>
-            <select name="" id="">
-              {roles.map((item,index)=>{
-                return(
-                  <section key={index}>
-                  <option value=""></option>
-                  </section>
-                )
-              })}
-            </select>
-          </section>
-        )
-      }
-    },
-    {
       header: "Action",
       id: "actions",
       cell: ({ row }) => {
@@ -153,11 +196,15 @@ export default function User() {
               <DropdownMenuContent align="end">
 
                 <DropdownMenuItem>
+                  <UserCircle className="mr-2 h-4 w-4" />
+                  Assign role
+                </DropdownMenuItem>
+                <DropdownMenuItem>
                   <Edit className="mr-2 h-4 w-4" />
                   Edit role
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  onClick={() => deleteRole(item.id)}
+                  onClick={() => deleteUser(item._id)}
                 >
                   <Trash className="mr-2 h-4 w-4" />
                   Delete
@@ -169,10 +216,6 @@ export default function User() {
       },
     },
   ]
-
-  const handleSearch = (query: string) => {
-    setSearchQuery(query)
-  }
 
   return (
     <div className="p-3">
@@ -197,9 +240,103 @@ export default function User() {
         {loading ? (
           <Skeleton className="h-10 w-32" />
         ) : (
-          <Button>
-            Create New Role
-          </Button>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant="outline">Create new role</Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-md">
+              <DialogHeader>
+                <DialogTitle>Create User</DialogTitle>
+                {/* <DialogDescription>
+                  Anyone who has this link will be able to view this.
+                </DialogDescription> */}
+              </DialogHeader>
+              <div className="flex items-center gap-2">
+                <form className="grid gap-4 w-full max-w-md">
+                  <div className="grid gap-2">
+                    <Label htmlFor="name">Name</Label>
+                    <Input
+                      id="name"
+                      name="name"
+                      placeholder="Enter name"
+                      value={formData.name}
+                      onChange={handleInput}
+                    />
+                  </div>
+
+                  <div className="grid gap-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                      id="email"
+                      name="email"
+                      type="email"
+                      placeholder="Enter email"
+                      value={formData.email}
+                      onChange={handleInput}
+                    />
+                  </div>
+
+                  <div className="grid gap-2">
+                    <Label htmlFor="password">Password</Label>
+                    <Input
+                      id="password"
+                      name="password"
+                      type="password"
+                      placeholder="Enter password"
+                      value={formData.password}
+                      onChange={handleInput}
+                    />
+                  </div>
+
+                  <div className="grid gap-2">
+                    <Label htmlFor="profile">Profile URL</Label>
+                    <Input
+                      id="profile"
+                      name="profile"
+                      placeholder="Enter profile image URL"
+                      value={formData.profile}
+                      onChange={handleInput}
+                    />
+                  </div>
+
+                  <div className="grid gap-2">
+                    <Label>Role</Label>
+                    <Select onValueChange={handleRoleChange}>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select a role" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {roles?.map((role,index) => (
+                          <SelectItem key={index} value={role._id.toString()}>
+                            {role.role}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+
+
+                  </div>
+
+                  <Button
+                    type="submit"
+                    variant='default'
+                  >
+                    Submit
+                  </Button>
+                </form>
+              </div>
+              <DialogFooter className="sm:justify-start">
+                <DialogClose asChild>
+                  <Button type="button" variant="secondary">
+                    Close
+                  </Button>
+                </DialogClose>
+                <Button type="button" variant='default' onClick={createRole}>
+                  Submit
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         )}
       </div>
 
