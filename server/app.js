@@ -30,6 +30,7 @@ mongoose.connect(Database, {
 const roleRoute = require("./routes/authentication/roles");
 const permissionRoute = require("./routes/authentication/permission");
 const userRoute = require("./routes/authentication/users");
+const productCategoryRoute = require("./routes/products/categories")
 
 // Root route
 app.get("/", (req, res) => {
@@ -40,6 +41,7 @@ app.get("/", (req, res) => {
 app.use("/api/roles", roleRoute); 
 app.use("/api/permission", permissionRoute); 
 app.use("/api/users", userRoute); 
+app.use("/api/category", productCategoryRoute); 
 
 // Start the server
 app.listen(PORT, () => {

@@ -8,6 +8,8 @@ import Roles from "./dashboard/components/Authentication/Roles"
 import Permission from "./dashboard/components/Authentication/Permission"
 import LoginPage from "./dashboard/components/Authentication/Users/Login"
 import User from "./dashboard/components/Authentication/User"
+import Category from "./dashboard/components/Products/Categories"
+import Products from "./dashboard/components/Products/Products"
 const App = () => {
   return (
     <main>
@@ -26,6 +28,8 @@ const App = () => {
           <Route path="permission" element={<Permission/>}/>
           <Route path="user" element={<User/>}/>
           <Route path="login" element={<LoginPage/>}/>
+          <Route path="categories" element={<Category/>}/>
+          <Route path="products" element={<Products/>}/>
         </Route>
       </Routes>
       </BrowserRouter>

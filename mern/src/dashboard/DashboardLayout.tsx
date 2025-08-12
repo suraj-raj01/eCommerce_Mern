@@ -16,7 +16,7 @@ export default function Page() {
           <Header />
 
           {/* Scrollable Content Area */}
-          <section className="flex-1 overflow-y-auto p-2 rounded-sm shadow-2xl">
+          <section className="flex-1 overflow-y-auto p-2 rounded-sm">
             <Outlet />
           </section>
         </div>

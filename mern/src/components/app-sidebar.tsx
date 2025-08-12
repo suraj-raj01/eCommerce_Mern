@@ -13,7 +13,6 @@ import {
 } from "lucide-react"
 
 import { NavMain } from "../components/nav-main"
-import { NavProjects } from "../components/nav-projects"
 import { NavSecondary } from "../components/nav-secondary"
 import { NavUser } from "../components/nav-user"
 import {
@@ -59,17 +58,17 @@ const data = {
       ],
     },
     {
-      title: "Models",
+      title: "Products",
       url: "#",
       icon: Bot,
       items: [
         {
-          title: "Genesis",
-          url: "#",
+          title: "Categories",
+          url: "/dashboard/categories",
         },
         {
-          title: "Explorer",
-          url: "#",
+          title: "Products",
+          url: "/dashboard/products",
         },
         {
           title: "Quantum",
@@ -177,7 +176,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
-        <NavProjects projects={data.projects} />
+        {/* <NavProjects projects={data.projects} /> */}
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
