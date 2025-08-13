@@ -4,8 +4,9 @@ import { Skeleton } from "../../../components/ui/skeleton"
 import { useNavigate } from "react-router-dom"
 
 const Products = () => {
-  const[loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false)
   const navigate = useNavigate();
+  setLoading(false);
   return (
     <section>
       <div className="flex justify-between items-center mb-4">
