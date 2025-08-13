@@ -22,7 +22,7 @@ const Header = () => {
 
     return (
         <section>
-            <header className="flex h-14 shrink-0 items-center justify-between gap-2 border border-l-0 px-4">
+            <header className="flex h-14 shrink-0 items-center justify-between gap-2 border border-l-0 border-t-0 px-4">
                 <section className="flex items-center justify-center gap-2">
                     <SidebarTrigger className="-ml-1" />
                     <Separator

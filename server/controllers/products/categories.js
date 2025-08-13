@@ -3,6 +3,7 @@ const CategoryModel = require("../../models/productModel/categories")
 // create categories & subcategories with images
 const createCategory = async (req, res) => {
     try {
+        console.log(req.body)
         const { category, categoryimg, subcategories } = req.body;
         const newCategory = new CategoryModel({ category, categoryimg, subcategories });
         await newCategory.save();
@@ -48,13 +49,24 @@ const updateCategory = async (req, res) => {
         if (!id) {
             return res.status(400).json({ message: "Category ID is required" });
         }
-        const { categories, categoryimg, subcategories } = req.body;
-        const updatedCategory = await CategoryModel.findByIdAndUpdate(id, { categories, categoryimg, subcategories }, { new: true });
-        res.status(200).json({ message: "Category updated successfully", categories: updatedCategory });
+
+        const { category, categoryimg, subcategories } = req.body;
+        const updatedCategory = await CategoryModel.findByIdAndUpdate(
+            id,
+            { category, categoryimg, subcategories },
+            { new: true }
+        );
+
+        res.status(200).json({
+            message: "Category updated successfully",
+            category: updatedCategory,
+        });
     } catch (error) {
-        res.status(500).json({ message: "Error updating categories", error });
+        res.status(500).json({ message: "Error updating category", error });
     }
-}
+};
+
+
 
 const deleteCategory = async (req, res) => {
     try {
@@ -74,7 +86,6 @@ const deleteCategory = async (req, res) => {
 const searchCategory = async (req, res) => {
     try {
         const { id } = req.params;
-
         if (!id) {
             return res.status(400).json({ message: "Search term is required" });
         }
@@ -83,7 +94,7 @@ const searchCategory = async (req, res) => {
             { category: { $regex: id, $options: "i" } }
         ];
 
-        const category = await CategoryModel.findOne({ $or: conditions });
+        const category = await CategoryModel.find({ $or: conditions });
 
         if (!category) {
             return res.status(404).json({ message: "Category not found" });
@@ -91,7 +102,7 @@ const searchCategory = async (req, res) => {
 
         res.status(200).json({
             message: "Category retrieved successfully",
-            category
+            category:category
         });
 
     } catch (error) {
