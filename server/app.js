@@ -7,7 +7,7 @@ require("dotenv").config();
 
 // Environment variables
 const PORT = process.env.PORT || 8000;
-const Database = process.env.DATABASE_URL || "mongodb://localhost:27017/surajmern";
+const Database = process.env.DATABASE_URL || "mongodb+srv://surajkumarbgu555:RCGboeI5eaust2ET@cluster0.enw65fr.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 
 // Middlewares
 app.use(cors());
