@@ -6,6 +6,7 @@ import { Label } from "../components/ui/label"
 import { useState } from "react"
 import axios from "axios"
 import { useNavigate } from "react-router-dom"
+import Swal from "sweetalert2"
 
 export function LoginForm({
   className,
@@ -25,13 +26,21 @@ export function LoginForm({
     setLoading(true)
 
     const payload = {
-      email:email,
-      password:password
+      email: email,
+      password: password
     }
 
     try {
-      const response = await axios.post("http://localhost:8000/api/users/login",payload);
+      const response = await axios.post("http://localhost:8000/api/users/login", payload);
       console.log(response.data);
+      const user = response.data;
+      localStorage.setItem("user", JSON.stringify(user, null, 2))
+      Swal.fire({
+        title: response.data.message || "Login successfully completed!",
+        text: "Welcome back! You are now logged in to your account.",
+        icon: "success",
+        confirmButtonText: "OK"
+      });
       navigate("/dashboard")
     } catch (err: any) {
       setError(err.message)

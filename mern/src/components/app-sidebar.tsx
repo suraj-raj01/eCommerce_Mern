@@ -49,7 +49,7 @@ const data = {
         },
         {
           title: "Manage Permissions",
-          url: "#",
+          url: "/dashboard/managepermission",
         },
         {
           title: "Users",

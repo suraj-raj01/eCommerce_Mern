@@ -12,13 +12,37 @@ import { Button } from '../../../components/ui/button'
 import { Trash, Edit, MoreHorizontal } from 'lucide-react'
 import Swal from 'sweetalert2'
 import { Skeleton } from '../../../components/ui/skeleton'
+import api from "../../../API"
+import { useForm } from "react-hook-form"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "../../../components/ui/dialog"
+import {
+  Form,
+  FormControl, 
+  FormField, 
+  FormItem, 
+  FormLabel, 
+  FormMessage,
+} from "../../../components/ui/form"
+import { Input } from '../../../components/ui/input'
+import { Textarea } from '../../../components/ui/textarea'
 
 type Permission = {
-  id: string
-  permission: string
-  description: string
-}
+  _id: any
+  id: string;
+  permission: string;
+  description: string;
+};
 
+type FormValues = {
+  permission: string;
+  description: string;
+};
 
 export default function Permission() {
   const [roles, setRoles] = useState<Permission[]>([])
@@ -26,8 +50,89 @@ export default function Permission() {
   const [pageCount, setPageCount] = useState(1)
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState<string>('')
+  const [open, setOpen] = useState(false)
+  const [editing, setEditing] = useState<Permission | null>(null)
 
-  const api =  'http://localhost:8000/api'
+  const form = useForm<FormValues>({
+    defaultValues: { permission: "", description: "" },
+  })
+
+  const resetForm = () => {
+    form.reset({ permission: "", description: "" })
+    setEditing(null)
+  }
+
+  const handleCreate = () => {
+    resetForm()
+    setOpen(true)
+  }
+
+  const handleEdit = (row: Permission) => {
+    setEditing(row)
+    form.reset({ permission: row.permission, description: row.description })
+    setOpen(true)
+  }
+
+  const onSubmit = async (values: FormValues) => {
+    try {
+      if (editing) {
+        // UPDATE existing permission
+        await axios.patch(`${api}/permission/updatepermission/${editing._id}`, values)
+        Swal.fire({
+          title: "Permission updated successfully",
+          icon: "success",
+        })
+      } else {
+        // CREATE new permission
+        await axios.post(`${api}/permission/createpermission`, values)
+        Swal.fire({
+          title: "Permission created successfully",
+          icon: "success",
+        })
+      }
+
+      setOpen(false)
+      resetForm()
+      fetchPermission() // reload table from API
+    } catch (error) {
+      console.error("Error saving permission:", error)
+      Swal.fire({
+        title: "Error",
+        text: "Failed to save permission. Please try again.",
+        icon: "error",
+      })
+    }
+  }
+
+  const deletePermission = async (id: string) => {
+    try {
+      const result = await Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!'
+      })
+
+      if (result.isConfirmed) {
+        await axios.delete(`${api}/permission/deletepermission/${id}`)
+        Swal.fire({
+          title: "Permission deleted successfully",
+          icon: "success",
+        })
+        fetchPermission()
+      }
+    } catch (error) {
+      console.error("Error deleting permission:", error)
+      Swal.fire({
+        title: "Error",
+        text: "Failed to delete permission. Please try again.",
+        icon: "error",
+      })
+    }
+  }
 
   const fetchPermission = async () => {
     try {
@@ -36,47 +141,36 @@ export default function Permission() {
       if (searchQuery) {
         response = await axios.post(`${api}/permission/searchpermission/${searchQuery}`)
         setRoles(response?.data?.data || [])
-        console.log(response.data,"search data");
+        console.log(response.data, "search data")
+        // For search, we might not have pagination info
+        setPageCount(1)
       } else {
         response = await axios.get(`${api}/permission/getpermission?page=${page}&limit=5`)
         setRoles(response?.data?.data || [])
-        setPage(response.data.currentPage)
-        setPageCount(response.data.pageCount)
+        setPage(response.data.currentPage || page)
+        setPageCount(response.data.pageCount || response.data.totalPages || 1)
         console.log("roles data", response.data)
       }
-      const { data } = response
-      setPageCount(data.totalPages || 1)
     } catch (error) {
-      console.error('Error fetching roles:', error)
+      console.error('Error fetching permissions:', error)
+      Swal.fire({
+        title: "Error",
+        text: "Failed to fetch permissions. Please try again.",
+        icon: "error",
+      })
     } finally {
       setLoading(false)
     }
   }
 
   useEffect(() => {
-    fetchPermission();
+    fetchPermission()
   }, [page, searchQuery])
-
-  const deleteRole = async (id: any) => {
-    try {
-      await axios.delete(`${api}/vendor/role/${id}`)
-      Swal.fire({
-        title: "Role Deleted Successfully",
-        icon: "success",
-        draggable: true
-      });
-      fetchPermission();
-    } catch (error) {
-      console.error('Error deleting permission:', error)
-      alert('Failed to delete Role. Please try again.')
-    }
-  }
-
 
   const columns: ColumnDef<Permission>[] = [
     {
       accessorKey: 'permission',
-      header: "Role Name"
+      header: "Permission Name"
     },
     {
       accessorKey: 'description',
@@ -89,7 +183,6 @@ export default function Permission() {
         const item = row.original
         return (
           <div className='flex items-center justify-start gap-1'>
-
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="h-8 w-8 p-0">
@@ -98,16 +191,15 @@ export default function Permission() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleEdit(item)}>
                   <Edit className="mr-2 h-4 w-4" />
-                  Edit role
+                  Edit Permission
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  onClick={() => deleteRole(item.id)}
+                  onClick={() => deletePermission(item.id)}
                 >
                   <Trash className="mr-2 h-4 w-4" />
-                  Delete
+                  Delete Permission
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -119,6 +211,7 @@ export default function Permission() {
 
   const handleSearch = (query: string) => {
     setSearchQuery(query)
+    setPage(1) // Reset to first page when searching
   }
 
   return (
@@ -133,9 +226,9 @@ export default function Permission() {
           ) : (
             <>
               <div>
-                <h1 className="text-3xl font-bold tracking-tight">Permission</h1>
+                <h1 className="text-3xl font-bold tracking-tight">Permissions</h1>
                 <p className="text-muted-foreground">
-                  Manage and track all the permission
+                  Manage and track all permissions
                 </p>
               </div>
             </>
@@ -144,11 +237,58 @@ export default function Permission() {
         {loading ? (
           <Skeleton className="h-10 w-32" />
         ) : (
-          <Button>
-            Create New Role
-          </Button>
+          <Button onClick={handleCreate}>Add Permission</Button>
         )}
       </div>
+
+      <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) resetForm(); }}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>{editing ? "Edit Permission" : "Add Permission"}</DialogTitle>
+          </DialogHeader>
+
+          <Form {...form}>
+            <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
+              <FormField
+                control={form.control}
+                name="permission"
+                rules={{ required: "Permission is required" }}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Permission</FormLabel>
+                    <FormControl>
+                      <Input placeholder="e.g. product.create" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="description"
+                rules={{ required: "Description is required" }}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Description</FormLabel>
+                    <FormControl>
+                      <Textarea placeholder="Short description of what this permission allows" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <DialogFooter className="gap-2">
+                <Button type="button" variant="outline" onClick={() => { setOpen(false); resetForm(); }}>
+                  Cancel
+                </Button>
+                <Button type="submit">{editing ? "Save changes" : "Create"}</Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
 
       <DataTable
         columns={columns}

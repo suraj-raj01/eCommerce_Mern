@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Button } from "../../../components/ui/button"
 import { Skeleton } from "../../../components/ui/skeleton"
 import { useNavigate } from "react-router-dom"
@@ -6,7 +6,9 @@ import { useNavigate } from "react-router-dom"
 const Products = () => {
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate();
-  setLoading(false);
+  useEffect(()=>{
+    setLoading(false);
+  },[])
   return (
     <section>
       <div className="flex justify-between items-center mb-4">
@@ -35,6 +37,7 @@ const Products = () => {
           </Button>
         )}
       </div>
+      Product Page
     </section>
   )
 }

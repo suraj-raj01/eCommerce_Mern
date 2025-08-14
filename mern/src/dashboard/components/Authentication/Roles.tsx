@@ -9,38 +9,99 @@ import {
   DropdownMenuTrigger,
 } from "../../../components/ui/dropdown-menu"
 import { Button } from '../../../components/ui/button'
-import { Trash, Edit, MoreHorizontal } from 'lucide-react'
+import { Trash, Edit, MoreHorizontal, Eye } from 'lucide-react'
 import Swal from 'sweetalert2'
 import { Skeleton } from '../../../components/ui/skeleton'
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "../../../components/ui/dialog"
 import { Input } from "../../../components/ui/input"
-import { Label } from "../../../components/ui/label"
+import { Badge } from '../../../components/ui/badge'
+import { useForm } from "react-hook-form"
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "../../../components/ui/form"
+import { Checkbox } from "../../../components/ui/checkbox"
+
+type Permission = {
+  _id: string
+  permission: string
+  description: string
+}
 
 type Roles = {
+  permissionId: Permission[]
   _id: string
+  role: string
   name: string
-  permissions: []
+  permissions: Permission[]
   roleId: string
 }
 
+type FormValues = {
+  role: string
+  permissionId: string[]
+}
 
 export default function Roles() {
   const [roles, setRoles] = useState<Roles[]>([])
+  const [permissions, setPermissions] = useState<Permission[]>([])
   const [page, setPage] = useState(1)
   const [pageCount, setPageCount] = useState(1)
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState<string>('')
-  const [input, setInput] = useState('')
+  const [open, setOpen] = useState(false)
+  const [editing, setEditing] = useState<Roles | null>(null)
 
-  const api =  'http://localhost:8000/api'
+  const api = 'http://localhost:8000/api'
+
+  const form = useForm<FormValues>({
+    defaultValues: {
+      role: "",
+      permissionId: []
+    }
+  })
+
+  const resetForm = () => {
+    form.reset({
+      role: "",
+      permissionId: []
+    })
+    setEditing(null)
+  }
+
+  const handleCreate = () => {
+    resetForm()
+    setOpen(true)
+  }
+
+  const handleEdit = (roleData: Roles) => {
+    setEditing(roleData)
+    const permissionIds = roleData.permissionId?.map(p => p._id) || []
+    form.reset({
+      role: roleData.role || roleData.name,
+      permissionId: permissionIds
+    })
+    setOpen(true)
+  }
+
+  const fetchPermissions = async () => {
+    try {
+      const response = await axios.get(`${api}/permission/getpermission?limit=100`)
+      setPermissions(response?.data?.data || [])
+    } catch (error) {
+      console.error('Error fetching permissions:', error)
+    }
+  }
 
   const fetchRoles = async () => {
     try {
@@ -49,66 +110,134 @@ export default function Roles() {
       if (searchQuery) {
         response = await axios.post(`${api}/roles/searchrole/${searchQuery}`)
         setRoles(response?.data?.data || [])
-        // console.log(response.data,"search data");
+        setPageCount(1)
       } else {
-        response = await axios.get(`${api}/roles/getrole?page=${page}&limit=3`)
+        response = await axios.get(`${api}/roles/getrole?page=${page}&limit=5`)
         setRoles(response?.data?.data || [])
-        setPage(response.data.currentPage)
-        setPageCount(response.data.pageCount)
-        console.log("roles data", response.data)
+        setPage(response.data.currentPage || page)
+        setPageCount(response.data.pageCount || response.data.totalPages || 1)
       }
-      const { data } = response
-      setPageCount(data.totalPages || 1)
     } catch (error) {
       console.error('Error fetching roles:', error)
+      Swal.fire({
+        title: "Error",
+        text: "Failed to fetch roles. Please try again.",
+        icon: "error",
+      })
     } finally {
       setLoading(false)
     }
   }
 
   useEffect(() => {
-    fetchRoles();
+    fetchRoles()
   }, [page, searchQuery])
 
-  const handleInput = async (e: any) => {
-    console.log(e.target.value, "input value");
-    setInput(e.target.value)
-  }
+  useEffect(() => {
+    fetchPermissions()
+  }, [])
 
-  const createRole = async() => {
+  const onSubmit = async (values: FormValues) => {
     try {
-      const response = await axios.post(`${api}/roles/createrole`, { role: input, permissionId: [] });
-      Swal.fire({
-        title: response.data.message || "Role Created Successfully",
-        icon: "success",
-        draggable: true
-      });
+      if (editing) {
+        // UPDATE existing role
+        await axios.patch(`${api}/roles/updaterole/${editing._id}`, {
+          role: values.role,
+          permissionId: values.permissionId
+        })
+        Swal.fire({
+          title: "Role updated successfully",
+          icon: "success",
+          draggable: true
+        })
+      } else {
+        // CREATE new role
+        await axios.post(`${api}/roles/createrole`, {
+          role: values.role,
+          permissionId: values.permissionId
+        })
+        Swal.fire({
+          title: "Role created successfully",
+          icon: "success",
+          draggable: true
+        })
+      }
+
+      setOpen(false)
+      resetForm()
       fetchRoles()
     } catch (error) {
-      console.error('Error Creating permission:', error)
-    }
-  }
-
-  const deleteRole = async (id: any) => {
-    try {
-      await axios.delete(`${api}/roles/deleterole/${id}`)
+      console.error('Error saving role:', error)
       Swal.fire({
-        title: "Role Deleted Successfully",
-        icon: "success",
-        draggable: true
-      });
-      fetchRoles();
-    } catch (error) {
-      console.error('Error deleting permission:', error)
-      alert('Failed to delete Role. Please try again.')
+        title: "Error",
+        text: "Failed to save role. Please try again.",
+        icon: "error",
+      })
     }
   }
 
+  const deleteRole = async (id: string) => {
+    try {
+      const result = await Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!'
+      })
+
+      if (result.isConfirmed) {
+        await axios.delete(`${api}/roles/deleterole/${id}`)
+        Swal.fire({
+          title: "Role deleted successfully",
+          icon: "success",
+          draggable: true
+        })
+        fetchRoles()
+      }
+    } catch (error) {
+      console.error('Error deleting role:', error)
+      Swal.fire({
+        title: "Error",
+        text: "Failed to delete role. Please try again.",
+        icon: "error",
+      })
+    }
+  }
 
   const columns: ColumnDef<Roles>[] = [
     {
       accessorKey: 'role',
-      header: "Role Name"
+      header: "Role Name",
+      cell: ({ row }) => {
+        return row.original.role || row.original.name || 'N/A'
+      }
+    },
+    {
+      accessorKey: 'permissionId',
+      header: "Permissions",
+      cell: ({ row }) => {
+        const permissions = row.original.permissionId || row.original.permissions || []
+        if (!Array.isArray(permissions) || permissions.length === 0) {
+          return <Badge variant="secondary">No permissions</Badge>
+        }
+        return (
+          <div className="flex gap-1 flex-wrap">
+            {permissions.slice(0, 3).map((item, index) => (
+              <Badge key={index} variant="outline" className='text-xs rounded-xs'>
+                {item.permission}
+              </Badge>
+            ))}
+            {permissions.length > 3 && (
+              <Badge variant="secondary" className='text-xs'>
+                +{permissions.length - 3} more
+              </Badge>
+            )}
+          </div>
+        )
+      }
     },
     {
       header: "Action",
@@ -117,7 +246,6 @@ export default function Roles() {
         const item = row.original
         return (
           <div className='flex items-center justify-start gap-1'>
-
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="h-8 w-8 p-0">
@@ -126,13 +254,17 @@ export default function Roles() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-
                 <DropdownMenuItem>
+                  <Eye className="mr-2 h-4 w-4" />
+                  View role
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleEdit(item)}>
                   <Edit className="mr-2 h-4 w-4" />
                   Edit role
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => deleteRole(item._id)}
+                  className="text-red-600 focus:text-red-600"
                 >
                   <Trash className="mr-2 h-4 w-4" />
                   Delete
@@ -147,6 +279,7 @@ export default function Roles() {
 
   const handleSearch = (query: string) => {
     setSearchQuery(query)
+    setPage(1)
   }
 
   return (
@@ -172,43 +305,123 @@ export default function Roles() {
         {loading ? (
           <Skeleton className="h-10 w-32" />
         ) : (
-           <Dialog>
-            <DialogTrigger asChild>
-              <Button variant="outline">Create new role</Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-md">
-              <DialogHeader>
-                <DialogTitle>Create role*</DialogTitle>
-                {/* <DialogDescription>
-                  Anyone who has this link will be able to view this.
-                </DialogDescription> */}
-              </DialogHeader>
-              <div className="flex items-center gap-2">
-                <div className="grid flex-1 gap-2">
-                  <Label htmlFor="link" className="sr-only">
-                    Link
-                  </Label>
-                  <Input
-                    id="link"
-                    placeholder='enter role ...'
-                    onChange={handleInput}
-                  />
-                </div>
-              </div>
-              <DialogFooter className="sm:justify-start">
-                <DialogClose asChild>
-                  <Button type="button" variant="secondary">
-                    Close
-                  </Button>
-                </DialogClose>
-                <Button type="button" variant='default' onClick={createRole}>
-                  Submit
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+          <Button onClick={handleCreate}>Create Role</Button>
         )}
       </div>
+
+      <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) resetForm(); }}>
+        <DialogContent className="sm:max-w-md max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{editing ? "Edit Role" : "Create Role"}</DialogTitle>
+          </DialogHeader>
+
+          <Form {...form}>
+            <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
+              <FormField
+                control={form.control}
+                name="role"
+                rules={{ required: "Role name is required" }}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Role Name *</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter role name" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="permissionId"
+                render={({ field }) => {
+                  const allSelected = permissions.length > 0 && field.value?.length === permissions.length
+                  const someSelected = field.value?.length > 0 && field.value?.length < permissions.length
+
+                  const handleSelectAll = (checked: boolean) => {
+                    if (checked) {
+                      field.onChange(permissions.map(p => p._id))
+                    } else {
+                      field.onChange([])
+                    }
+                  }
+
+                  return (
+                    <FormItem>
+                      <div className="flex items-center justify-between">
+                        <FormLabel>Permissions</FormLabel>
+                        <div className="flex items-center space-x-2">
+                          <Checkbox
+                            id="select-all"
+                            checked={allSelected}
+                            ref={(el) => {
+                              if (el && 'indeterminate' in el) {
+                                (el as HTMLInputElement).indeterminate = someSelected
+                              }
+                            }}
+                            onCheckedChange={handleSelectAll}
+                          />
+                          <label
+                            htmlFor="select-all"
+                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                          >
+                            Select All ({field.value?.length || 0}/{permissions.length})
+                          </label>
+                        </div>
+                      </div>
+                      <div className="space-y-2 max-h-48 overflow-y-auto border rounded-md p-3">
+                        {permissions.map((permission) => (
+                          <div key={permission._id} className="flex items-center space-x-2">
+                            <Checkbox
+                              id={permission._id}
+                              checked={field.value?.includes(permission._id)}
+                              onCheckedChange={(checked) => {
+                                const updatedValue = checked
+                                  ? [...(field.value || []), permission._id]
+                                  : (field.value || []).filter(id => id !== permission._id)
+                                field.onChange(updatedValue)
+                              }}
+                            />
+                            <div className="flex-1">
+                              <label
+                                htmlFor={permission._id}
+                                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                              >
+                                {permission.permission}
+                              </label>
+                              <p className="text-xs text-muted-foreground">
+                                {permission.description}
+                              </p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                      {permissions.length === 0 && (
+                        <p className="text-sm text-muted-foreground">No permissions available</p>
+                      )}
+                      <FormMessage />
+                    </FormItem>
+                  )
+                }}
+              />
+
+              <DialogFooter className="gap-2">
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={() => { setOpen(false); resetForm(); }}
+                >
+                  Cancel
+                </Button>
+                <Button type="submit">
+                  {editing ? "Update Role" : "Create Role"}
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
 
       <DataTable
         columns={columns}

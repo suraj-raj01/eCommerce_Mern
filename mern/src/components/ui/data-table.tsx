@@ -32,6 +32,8 @@ import {
 } from '../../components/ui/dropdown-menu'
 import { ChevronDown } from 'lucide-react'
 import { Skeleton } from '../../components/ui/skeleton'
+import api from "../../API"
+
 
 // Table skeleton rows component
 const TableSkeleton = ({ columns, rows = 5 }: { columns: number; rows?: number }) => (
@@ -111,7 +113,7 @@ export function DataTable<TData, TValue>({
           <Skeleton className="h-9 w-80" />
         ) : (
           <Input
-            placeholder="Search by name/category/id..."
+            placeholder="Search ..."
             value={globalFilter}
             onChange={(e) => setGlobalFilter(e.target.value)}
             className="max-w-sm"
@@ -180,16 +182,24 @@ export function DataTable<TData, TValue>({
                             cellValue.startsWith('data:image'));
 
                         if (isImage) {
+                          let imageUrl;
+                          if (/^https?:\/\//.test(cellValue)) {
+                            imageUrl = cellValue;
+                          }
+                          else {
+                            imageUrl = `${api}/uploads/${cellValue}`;
+                          }
                           return (
                             <img
-                              src={cellValue}
+                              src={imageUrl}
                               alt="Image"
                               width={40}
                               height={40}
-                              className="object-cover rounded"
+                              className="object-cover rounded-full"
                             />
                           );
                         }
+
 
                         return flexRender(cell.column.columnDef.cell, cell.getContext());
                       })()}

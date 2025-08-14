@@ -12,17 +12,44 @@ import {
     SidebarTrigger,
 } from "../../components/ui/sidebar"
 import { ModeToggle } from "../../Theme"
-import { useNavigate } from "react-router-dom"
+// import { useNavigate } from "react-router-dom"
+import { useEffect, useState } from "react"
+import Swal from "sweetalert2"
 const Header = () => {
+    const [email, setEmail] = useState('')
 
-    const router = useNavigate();
-    const logout = () =>{
-        router("/")
+    // const router = useNavigate();
+    const logout = () => {
+        localStorage.clear();
+        Swal.fire({
+            title: "Are you sure?",
+            text: "You will be logged out of your account.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, logout",
+        }).then((result) => {
+            if (result.isConfirmed) {
+                localStorage.clear(); 
+                window.location.href = "/"; 
+            }
+        });
     }
+    useEffect(() => {
+        const user = localStorage.getItem('user');
+        if (user) {
+            const parsedUser = JSON.parse(user);
+            setEmail(parsedUser?.user.name)
+            // console.log(parsedUser, "User from localStorage");
+        } else {
+            console.log("No user in localStorage");
+        }
+    }, []);
 
     return (
         <section>
-            <header className="flex h-14 shrink-0 items-center justify-between gap-2 border border-l-0 border-t-0 px-4">
+            <header className="flex h-14 shrink-0 items-center justify-between gap-2 border-b-1 px-4">
                 <section className="flex items-center justify-center gap-2">
                     <SidebarTrigger className="-ml-1" />
                     <Separator
@@ -44,8 +71,9 @@ const Header = () => {
                     </Breadcrumb>
                 </section>
                 <section className="flex items-center justify-center gap-2">
-                    <ModeToggle/>
-                    <LogOut onClick={logout} className=" dark:bg-white cursor-pointer dark:text-red-600 bg-red-600 text-white h-8 w-8 p-2 rounded-full border-1"/>
+                    {email}
+                    <ModeToggle />
+                    <LogOut onClick={logout} className=" dark:bg-white cursor-pointer dark:text-red-600 bg-red-600 text-white h-8 w-8 p-2 rounded-full border-1" />
                 </section>
             </header>
         </section>

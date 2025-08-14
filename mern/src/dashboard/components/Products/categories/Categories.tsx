@@ -95,7 +95,7 @@ export default function Category() {
                     <div className='flex items-center justify-start gap-2'>
                         {row.original.subcategories.map((subcat: Category) => (
                             <section key={subcat._id} >
-                                <Badge variant='secondary' className='text-xs'>
+                                <Badge variant='secondary' className='bg-blue-500 rounded-xs text-xs'>
                                     {subcat.name}
                                 </Badge>
                             </section>

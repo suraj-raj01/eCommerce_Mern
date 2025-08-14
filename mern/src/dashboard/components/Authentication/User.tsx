@@ -9,56 +9,82 @@ import {
   DropdownMenuTrigger,
 } from "../../../components/ui/dropdown-menu"
 import { Button } from '../../../components/ui/button'
-import { Trash, Edit, MoreHorizontal, UserCircle } from 'lucide-react'
+import { Trash, Edit, MoreHorizontal, UserCircle, Eye } from 'lucide-react'
 import Swal from 'sweetalert2'
 import { Skeleton } from '../../../components/ui/skeleton'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../../../components/ui/select";
+import { useNavigate } from 'react-router-dom'
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "../../../components/ui/dialog"
-import { Input } from "../../../components/ui/input"
-import { Label } from "../../../components/ui/label"
+import { Badge } from '../../../components/ui/badge'
+import { Avatar, AvatarFallback, AvatarImage } from '../../../components/ui/avatar'
+import { useForm } from "react-hook-form"
+import {
+  Form,
+  // FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "../../../components/ui/form"
+import { Checkbox } from "../../../components/ui/checkbox"
+import api from "../../../API"
+
+type Role = {
+  _id: string
+  role: string
+  name: string
+  permissions?: any[]
+}
 
 type Users = {
-  _id(_id: any): void
+  _id: string
   role: string
   id: string
   name: string
   email: string
   password: string
   profile: string
-  roleId: string
+  roleId: Role[] | string
 }
 
+type AssignRoleFormValues = {
+  roleId: string[]
+}
 
 export default function User() {
   const [users, setUser] = useState<Users[]>([])
-  const [roles, setRole] = useState<Users[]>([])
+  const [roles, setRoles] = useState<Role[]>([])
   const [page, setPage] = useState(1)
   const [pageCount, setPageCount] = useState(1)
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState<string>('')
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    profile: '',
-    roleId: '',
-  });
+  
+  // Dialog states
+  const [viewDialogOpen, setViewDialogOpen] = useState(false)
+  const [assignRoleDialogOpen, setAssignRoleDialogOpen] = useState(false)
+  const [selectedUser, setSelectedUser] = useState<Users | null>(null)
 
-  const api = 'http://localhost:8000/api'
+  const navigate = useNavigate()
+
+  const assignRoleForm = useForm<AssignRoleFormValues>({
+    defaultValues: {
+      roleId: []
+    }
+  })
+
+  const fetchRoles = async () => {
+    try {
+      const response = await axios.get(`${api}/roles/getrole?limit=100`)
+      setRoles(response?.data?.data || [])
+    } catch (error) {
+      console.error('Error fetching roles:', error)
+    }
+  }
 
   const fetchUser = async () => {
     try {
@@ -67,94 +93,138 @@ export default function User() {
       if (searchQuery) {
         response = await axios.post(`${api}/users/searchuser/${searchQuery}`)
         setUser(response?.data?.data || [])
-        // console.log(response.data,"search data");
+        // console.log(response.data.data,"search data")
+        setPageCount(1)
       } else {
         response = await axios.get(`${api}/users/getuser?page=${page}&limit=3`)
         setUser(response?.data?.data || [])
-        setPage(response.data.currentPage)
-        setPageCount(response.data.pageCount)
-        // console.log("users data", response.data)
+        setPage(response.data.currentPage || page)
+        setPageCount(response.data.pageCount || response.data.totalPages || 1)
       }
-      const { data } = response
-      setPageCount(data.totalPages || 1)
     } catch (error) {
       console.error('Error fetching users:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const fetchRoles = async () => {
-    try {
-      setLoading(true)
-      const response = await axios.get(`${api}/roles/getrole`)
-      setRole(response?.data?.data || [])
-      setPage(response.data.currentPage)
-      setPageCount(response.data.pageCount)
-      console.log("users data", response.data.data)
-    } catch (error) {
-      console.error('Error fetching users:', error)
+      Swal.fire({
+        title: "Error",
+        text: "Failed to fetch users. Please try again.",
+        icon: "error",
+      })
     } finally {
       setLoading(false)
     }
   }
 
   useEffect(() => {
-    fetchUser();
-    fetchRoles();
+    fetchUser()
   }, [page, searchQuery])
 
-  const deleteUser = async (id: any) => {
+  useEffect(() => {
+    fetchRoles()
+  }, [])
+
+  const handleViewUser = (user: Users) => {
+    setSelectedUser(user)
+    setViewDialogOpen(true)
+  }
+
+  const handleAssignRole = (user: Users) => {
+    setSelectedUser(user)
+    const currentRoleIds = Array.isArray(user.roleId) 
+      ? user.roleId.map(role => role._id)
+      : user.roleId ? [user.roleId] : []
+    
+    assignRoleForm.reset({
+      roleId: currentRoleIds
+    })
+    setAssignRoleDialogOpen(true)
+  }
+
+  const onAssignRoleSubmit = async (values: AssignRoleFormValues) => {
+    if (!selectedUser) return
+
     try {
-      await axios.delete(`${api}/users/deleteuser/${id}`)
+      await axios.patch(`${api}/users/updateuser/${selectedUser._id}`, {
+        roleId: values.roleId
+      })
+      
       Swal.fire({
-        title: "Role Deleted Successfully",
+        title: "Roles assigned successfully",
         icon: "success",
         draggable: true
-      });
-      fetchUser();
+      })
+      
+      setAssignRoleDialogOpen(false)
+      setSelectedUser(null)
+      assignRoleForm.reset()
+      fetchUser()
     } catch (error) {
-      console.error('Error deleting permission:', error)
-      alert('Failed to delete Role. Please try again.')
+      console.error('Error assigning roles:', error)
+      Swal.fire({
+        title: "Error",
+        text: "Failed to assign roles. Please try again.",
+        icon: "error",
+      })
+    }
+  }
+
+  const deleteUser = async (id: string) => {
+    try {
+      const result = await Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!'
+      })
+
+      if (result.isConfirmed) {
+        const response = await axios.delete(`${api}/users/deleteuser/${id}`)
+        Swal.fire({
+          title: response.data.message || "User deleted successfully",
+          icon: "success",
+          draggable: true
+        })
+        fetchUser()
+      }
+    } catch (error) {
+      console.error('Error deleting user:', error)
+      Swal.fire({
+        title: "Error",
+        text: "Failed to delete user. Please try again.",
+        icon: "error",
+      })
     }
   }
 
   const handleSearch = (query: string) => {
     setSearchQuery(query)
+    setPage(1)
   }
 
-  const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const handleRoleChange = (value: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      roleId: value,
-    }));
-  };
-
-
-  const createRole = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      const response = await axios.post(`${api}/roles/createrole`, formData);
-      Swal.fire({
-        title: response.data.message || "Role Created Successfully",
-        icon: "success",
-        draggable: true
-      });
-    } catch (error) {
-      console.error('Error Creating permission:', error)
+  const getUserRoles = (user: Users) => {
+    if (Array.isArray(user.roleId)) {
+      return user.roleId
     }
+    return []
   }
-
 
   const columns: ColumnDef<Users>[] = [
+    {
+      accessorKey: 'profile',
+      header: "Profile",
+      cell: ({ row }) => {
+        const user = row.original
+        return (
+          <Avatar className="h-10 w-10">
+            <AvatarImage src={user.profile} alt={user.name} />
+            <AvatarFallback>
+              {user.name?.charAt(0)?.toUpperCase() || <UserCircle className="h-4 w-4" />}
+            </AvatarFallback>
+          </Avatar>
+        )
+      }
+    },
     {
       accessorKey: 'name',
       header: "User Name"
@@ -165,17 +235,27 @@ export default function User() {
     },
     {
       accessorKey: 'roleId',
-      header: "Role Name",
+      header: "Roles",
       cell: ({ row }) => {
-        const roles = row.original.roleId;
-        if (!Array.isArray(roles)) return null;
+        const userRoles = getUserRoles(row.original)
+        console.log(userRoles,"userroles")
+        if (userRoles.length === 0) {
+          return <Badge variant="secondary">No roles</Badge>
+        }
         return (
-          <div className="flex gap-1">
-            {roles.map((item, index) => (
-              <section key={index} className='shadow-md bg-accent pt-1 pb-1 pl-2 pr-2 rounded-md'>{item.role}</section>
+          <div className="flex gap-1 flex-wrap">
+            {userRoles.slice(0, 2).map((role, index) => (
+              <Badge key={index} variant="outline" className="text-xs rounded-xs">
+                {role.role || role.name}
+              </Badge>
             ))}
+            {userRoles.length > 2 && (
+              <Badge variant="secondary" className="text-xs">
+                +{userRoles.length - 2} more
+              </Badge>
+            )}
           </div>
-        );
+        )
       }
     },
     {
@@ -185,7 +265,6 @@ export default function User() {
         const item = row.original
         return (
           <div className='flex items-center justify-start gap-1'>
-
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="h-8 w-8 p-0">
@@ -194,14 +273,17 @@ export default function User() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-
-                <DropdownMenuItem>
-                  <UserCircle className="mr-2 h-4 w-4" />
-                  Assign role
+                <DropdownMenuItem onClick={() => handleViewUser(item)}>
+                  <Eye className="mr-2 h-4 w-4" />
+                  View Details
                 </DropdownMenuItem>
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleAssignRole(item)}>
+                  <UserCircle className="mr-2 h-4 w-4" />
+                  Assign Roles
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate(`/dashboard/edituser/${item._id}`)}>
                   <Edit className="mr-2 h-4 w-4" />
-                  Edit role
+                  Edit User
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => deleteUser(item._id)}
@@ -218,7 +300,7 @@ export default function User() {
   ]
 
   return (
-    <div className="p-3">
+    <section className="p-3">
       <div className="flex justify-between items-center mb-4">
         <div>
           {loading ? (
@@ -240,105 +322,161 @@ export default function User() {
         {loading ? (
           <Skeleton className="h-10 w-32" />
         ) : (
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button variant="outline">Create new role</Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-md">
-              <DialogHeader>
-                <DialogTitle>Create User</DialogTitle>
-                {/* <DialogDescription>
-                  Anyone who has this link will be able to view this.
-                </DialogDescription> */}
-              </DialogHeader>
-              <div className="flex items-center gap-2">
-                <form className="grid gap-4 w-full max-w-md">
-                  <div className="grid gap-2">
-                    <Label htmlFor="name">Name</Label>
-                    <Input
-                      id="name"
-                      name="name"
-                      placeholder="Enter name"
-                      value={formData.name}
-                      onChange={handleInput}
-                    />
-                  </div>
-
-                  <div className="grid gap-2">
-                    <Label htmlFor="email">Email</Label>
-                    <Input
-                      id="email"
-                      name="email"
-                      type="email"
-                      placeholder="Enter email"
-                      value={formData.email}
-                      onChange={handleInput}
-                    />
-                  </div>
-
-                  <div className="grid gap-2">
-                    <Label htmlFor="password">Password</Label>
-                    <Input
-                      id="password"
-                      name="password"
-                      type="password"
-                      placeholder="Enter password"
-                      value={formData.password}
-                      onChange={handleInput}
-                    />
-                  </div>
-
-                  <div className="grid gap-2">
-                    <Label htmlFor="profile">Profile URL</Label>
-                    <Input
-                      id="profile"
-                      name="profile"
-                      placeholder="Enter profile image URL"
-                      value={formData.profile}
-                      onChange={handleInput}
-                    />
-                  </div>
-
-                  <div className="grid gap-2">
-                    <Label>Role</Label>
-                    <Select onValueChange={handleRoleChange}>
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select a role" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {roles?.map((role,index) => (
-                          <SelectItem key={index} value={role._id.toString()}>
-                            {role.role}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-
-
-                  </div>
-
-                  <Button
-                    type="submit"
-                    variant='default'
-                  >
-                    Submit
-                  </Button>
-                </form>
-              </div>
-              <DialogFooter className="sm:justify-start">
-                <DialogClose asChild>
-                  <Button type="button" variant="secondary">
-                    Close
-                  </Button>
-                </DialogClose>
-                <Button type="button" variant='default' onClick={createRole}>
-                  Submit
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+          <Button onClick={() => navigate("/dashboard/createuser")}>
+            Create New User
+          </Button>
         )}
       </div>
+
+      {/* View User Details Dialog */}
+      <Dialog open={viewDialogOpen} onOpenChange={setViewDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>User Details</DialogTitle>
+          </DialogHeader>
+          {selectedUser && (
+            <div className="space-y-4">
+              <div className="flex items-center space-x-4">
+                <Avatar className="h-16 w-16">
+                  <AvatarImage src={`${api}/uploads/${selectedUser.profile}`} alt={selectedUser.name} />
+                  <AvatarFallback className="text-lg">
+                    {selectedUser.name?.charAt(0)?.toUpperCase() || <UserCircle className="h-6 w-6" />}
+                  </AvatarFallback>
+                </Avatar>
+                <div>
+                  <h3 className="text-lg font-semibold">{selectedUser.name}</h3>
+                  <p className="text-sm text-muted-foreground">{selectedUser.email}</p>
+                </div>
+              </div>
+              
+              <div>
+                <h4 className="font-medium mb-2">Assigned Roles</h4>
+                <div className="flex gap-2 flex-wrap">
+                  {getUserRoles(selectedUser).length > 0 ? (
+                    getUserRoles(selectedUser).map((role, index) => (
+                      <Badge key={index} variant="outline" className='rounded-xs'>
+                        {role.role || role.name}
+                      </Badge>
+                    ))
+                  ) : (
+                    <Badge variant="secondary">No roles assigned</Badge>
+                  )}
+                </div>
+              </div>
+
+              <div>
+                <h4 className="font-medium mb-2">User ID</h4>
+                <p className="text-sm font-mono bg-muted p-2 rounded">{selectedUser._id}</p>
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setViewDialogOpen(false)}>
+              Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Assign Roles Dialog */}
+      <Dialog open={assignRoleDialogOpen} onOpenChange={setAssignRoleDialogOpen}>
+        <DialogContent className="sm:max-w-md max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Assign Roles to {selectedUser?.name}</DialogTitle>
+          </DialogHeader>
+          
+          <Form {...assignRoleForm}>
+            <form className="space-y-4" onSubmit={assignRoleForm.handleSubmit(onAssignRoleSubmit)}>
+              <FormField
+                control={assignRoleForm.control}
+                name="roleId"
+                render={({ field }) => {
+                  const allSelected = roles.length > 0 && field.value?.length === roles.length
+                  const someSelected = field.value?.length > 0 && field.value?.length < roles.length
+
+                  const handleSelectAll = (checked: boolean) => {
+                    if (checked) {
+                      field.onChange(roles.map(role => role._id))
+                    } else {
+                      field.onChange([])
+                    }
+                  }
+
+                  return (
+                    <FormItem>
+                      <div className="flex items-center justify-between">
+                        <FormLabel>Available Roles</FormLabel>
+                        <div className="flex items-center space-x-2">
+                          <Checkbox
+                            id="select-all-roles"
+                            checked={allSelected}
+                            ref={(el) => {
+                              if (el && el instanceof HTMLInputElement) el.indeterminate = someSelected
+                            }}
+                            onCheckedChange={handleSelectAll}
+                          />
+                          <label
+                            htmlFor="select-all-roles"
+                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                          >
+                            Select All ({field.value?.length || 0}/{roles.length})
+                          </label>
+                        </div>
+                      </div>
+                      <div className="space-y-2 max-h-48 overflow-y-auto border rounded-md p-3">
+                        {roles.map((role) => (
+                          <div key={role._id} className="flex items-center space-x-2">
+                            <Checkbox
+                              id={role._id}
+                              checked={field.value?.includes(role._id)}
+                              onCheckedChange={(checked) => {
+                                const updatedValue = checked
+                                  ? [...(field.value || []), role._id]
+                                  : (field.value || []).filter(id => id !== role._id)
+                                field.onChange(updatedValue)
+                              }}
+                            />
+                            <div className="flex-1">
+                              <label
+                                htmlFor={role._id}
+                                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                              >
+                                {role.role || role.name}
+                              </label>
+                              {role.permissions && (
+                                <p className="text-xs text-muted-foreground">
+                                  {role.permissions.length} permissions
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                      {roles.length === 0 && (
+                        <p className="text-sm text-muted-foreground">No roles available</p>
+                      )}
+                      <FormMessage />
+                    </FormItem>
+                  )
+                }}
+              />
+
+              <DialogFooter className="gap-2">
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={() => setAssignRoleDialogOpen(false)}
+                >
+                  Cancel
+                </Button>
+                <Button type="submit">
+                  Assign Roles
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
 
       <DataTable
         columns={columns}
@@ -349,6 +487,6 @@ export default function User() {
         onSearch={handleSearch}
         isLoading={loading}
       />
-    </div>
+    </section>
   )
 }
