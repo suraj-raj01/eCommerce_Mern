@@ -1,3 +1,3 @@
-const api = 'http://localhost:8000/api';
-// const api = 'https://mern-ecommerce-7hy6.onrender.com/api';
+// const api = 'http://localhost:8000/api';
+const api = 'https://mern-ecommerce-7hy6.onrender.com/api';
 export default api;
