@@ -23,10 +23,10 @@ import {
 } from "../../../components/ui/dialog"
 import {
   Form,
-  FormControl, 
-  FormField, 
-  FormItem, 
-  FormLabel, 
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
   FormMessage,
 } from "../../../components/ui/form"
 import { Input } from '../../../components/ui/input'
@@ -215,8 +215,8 @@ export default function Permission() {
   }
 
   return (
-    <div className="p-3">
-      <div className="flex justify-between items-center mb-4">
+    <section className="p-2 sm:p-3 w-full">
+      <div className="flex flex-col sm:flex-row w-full sm:justify-between sm:items-center gap-3 mb-4">
         <div>
           {loading ? (
             <>
@@ -225,21 +225,22 @@ export default function Permission() {
             </>
           ) : (
             <>
-              <div>
-                <h1 className="text-3xl font-bold tracking-tight">Permissions</h1>
-                <p className="text-muted-foreground">
-                  Manage and track all permissions
-                </p>
-              </div>
+              <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Permissions</h1>
+              <p className="text-sm sm:text-base text-muted-foreground">
+                Manage and track all permissions
+              </p>
             </>
           )}
         </div>
         {loading ? (
           <Skeleton className="h-10 w-32" />
         ) : (
-          <Button onClick={handleCreate}>Add New Permission</Button>
+          <Button className="w-full sm:w-auto" onClick={handleCreate}>
+            Add New Permission
+          </Button>
         )}
       </div>
+
 
       <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) resetForm(); }}>
         <DialogContent className="sm:max-w-md">
@@ -290,15 +291,17 @@ export default function Permission() {
         </DialogContent>
       </Dialog>
 
-      <DataTable
-        columns={columns}
-        data={roles}
-        pageCount={pageCount}
-        currentPage={page}
-        onPageChange={setPage}
-        onSearch={handleSearch}
-        isLoading={loading}
-      />
-    </div>
+      <div className="w-full overflow-x-auto">
+        <DataTable
+          columns={columns}
+          data={roles}
+          pageCount={pageCount}
+          currentPage={page}
+          onPageChange={setPage}
+          onSearch={handleSearch}
+          isLoading={loading}
+        />
+      </div>
+    </section>
   )
 }

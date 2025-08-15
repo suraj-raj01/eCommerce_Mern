@@ -82,10 +82,10 @@ export default function ChatUI() {
   };
 
   return (
-    <div className="w-full max-w-1/2 mx-auto p-2 h-140 mt-10 flex flex-col">
+    <div className="w-full min-w-[300px] mx-auto p-2 h-140 mt-10 flex flex-col">
       <Card className="flex-1 flex flex-col border-2">
-        <CardHeader className="border-b">
-          <CardTitle className="flex items-center gap-3 text-xl">
+        <CardHeader className="border-b ">
+          <CardTitle className="flex items-center gap-3 sm:text-xs">
             <div className="p-2 rounded-full border">
               <Bot className="w-5 h-5" />
             </div>

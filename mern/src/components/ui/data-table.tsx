@@ -1,5 +1,3 @@
-'use client'
-
 import { useEffect, useState } from 'react'
 import {
   type ColumnDef,
@@ -67,7 +65,7 @@ export function DataTable<TData, TValue>({
   currentPage,
   onPageChange,
   onSearch,
-  isLoading = false, // Default to false
+  isLoading = false,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
@@ -95,60 +93,62 @@ export function DataTable<TData, TValue>({
     getFilteredRowModel: getFilteredRowModel(),
   })
 
-  // ✅ Debounce search input
+  // ✅ Debounce search
   useEffect(() => {
     const timeout = setTimeout(() => {
-      if (onSearch) {
-        onSearch(globalFilter)
-      }
-    }, 1000)
+      onSearch?.(globalFilter)
+    }, 500)
     return () => clearTimeout(timeout)
   }, [globalFilter, onSearch])
 
   return (
     <div className="w-full space-y-4">
       {/* Top Controls */}
-      <div className="flex items-center gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
         {isLoading ? (
-          <Skeleton className="h-9 w-80" />
+          <Skeleton className="h-9 w-full sm:w-80" />
         ) : (
           <Input
             placeholder="Search ..."
             value={globalFilter}
             onChange={(e) => setGlobalFilter(e.target.value)}
-            className="max-w-sm"
+            className="w-full sm:max-w-sm"
           />
         )}
 
         {isLoading ? (
-          <Skeleton className="h-9 w-20 ml-auto" />
+          <Skeleton className="h-9 w-full sm:w-20 sm:ml-auto" />
         ) : (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="ml-auto">
-                columns <ChevronDown className="ml-2 h-4 w-4" />
+              <Button variant="outline" className="w-full sm:w-auto sm:ml-auto">
+                Columns <ChevronDown className="ml-2 h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Manage View</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              {table.getAllColumns().filter((col) => col.getCanHide()).map((column) => (
-                <DropdownMenuCheckboxItem
-                  key={column.id}
-                  checked={column.getIsVisible()}
-                  onCheckedChange={(value) => column.toggleVisibility(!!value)}
-                >
-                  {column.id}
-                </DropdownMenuCheckboxItem>
-              ))}
+              {table.getAllColumns()
+                .filter((col) => col.getCanHide())
+                .map((column) => (
+                  <DropdownMenuCheckboxItem
+                    key={column.id}
+                    checked={column.getIsVisible()}
+                    onCheckedChange={(value) =>
+                      column.toggleVisibility(!!value)
+                    }
+                  >
+                    {column.id}
+                  </DropdownMenuCheckboxItem>
+                ))}
             </DropdownMenuContent>
           </DropdownMenu>
         )}
       </div>
 
-      {/* Table */}
-      <div className="rounded-md border">
-        <Table>
+      {/* Table with horizontal scroll for mobile */}
+      <div className="rounded-md border overflow-x-auto">
+        <Table className="min-w-[600px]"> {/* Ensures scroll on small screens */}
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
@@ -173,21 +173,19 @@ export function DataTable<TData, TValue>({
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
                       {(() => {
-                        const cellValue = cell.getValue();
-
+                        const cellValue = cell.getValue()
                         const isImage =
                           typeof cellValue === 'string' &&
                           (/\.(jpeg|jpg|png|gif|webp|svg)$/i.test(cellValue) ||
                             cellValue.toLowerCase().startsWith('https') ||
-                            cellValue.startsWith('data:image'));
+                            cellValue.startsWith('data:image'))
 
                         if (isImage) {
-                          let imageUrl;
+                          let imageUrl
                           if (/^https?:\/\//.test(cellValue)) {
-                            imageUrl = cellValue;
-                          }
-                          else {
-                            imageUrl = `${api}/uploads/${cellValue}`;
+                            imageUrl = cellValue
+                          } else {
+                            imageUrl = `${api}/uploads/${cellValue}`
                           }
                           return (
                             <img
@@ -197,9 +195,9 @@ export function DataTable<TData, TValue>({
                               height={40}
                               className="object-cover rounded-full"
                             />
-                          );
+                          )
                         }
-                        return flexRender(cell.column.columnDef.cell, cell.getContext());
+                        return flexRender(cell.column.columnDef.cell, cell.getContext())
                       })()}
                     </TableCell>
                   ))}
@@ -216,17 +214,17 @@ export function DataTable<TData, TValue>({
         </Table>
       </div>
 
-      {/* Pagination Controls */}
-      <div className="flex items-center justify-between text-sm text-muted-foreground">
-        <div className="space-x-2">
-          {isLoading ? (
-            <>
-              <Skeleton className="h-8 w-16 inline-block" />
-              <Skeleton className="h-4 w-24 inline-block mx-2" />
-              <Skeleton className="h-8 w-12 inline-block" />
-            </>
-          ) : (
-            <>
+      {/* Pagination */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-sm text-muted-foreground">
+        {isLoading ? (
+          <>
+            <Skeleton className="h-8 w-16" />
+            <Skeleton className="h-4 w-24" />
+            <Skeleton className="h-8 w-12" />
+          </>
+        ) : (
+          <>
+            <div className="flex flex-wrap gap-2">
               <Button
                 variant="outline"
                 size="sm"
@@ -235,9 +233,6 @@ export function DataTable<TData, TValue>({
               >
                 Previous
               </Button>
-              <span>
-                Page {currentPage} of {pageCount}
-              </span>
               <Button
                 variant="outline"
                 size="sm"
@@ -246,9 +241,12 @@ export function DataTable<TData, TValue>({
               >
                 Next
               </Button>
-            </>
-          )}
-        </div>
+            </div>
+            <span className="text-center sm:text-right">
+              Page {currentPage} of {pageCount}
+            </span>
+          </>
+        )}
       </div>
     </div>
   )

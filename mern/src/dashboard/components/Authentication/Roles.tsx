@@ -263,10 +263,9 @@ export default function Roles() {
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => deleteRole(item._id)}
-                  className="text-red-600 focus:text-red-600"
                 >
                   <Trash className="mr-2 h-4 w-4" />
-                  Delete
+                  Delete role
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

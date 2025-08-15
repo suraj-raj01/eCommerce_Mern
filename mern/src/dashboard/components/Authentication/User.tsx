@@ -299,7 +299,7 @@ export default function User() {
   ]
 
   return (
-    <section className="p-3">
+    <section className="p-3 w-full">
       <div className="flex justify-between items-center mb-4">
         <div>
           {loading ? (
