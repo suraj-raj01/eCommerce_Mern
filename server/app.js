@@ -30,6 +30,7 @@ const roleRoute = require("./routes/authentication/roles");
 const permissionRoute = require("./routes/authentication/permission");
 const userRoute = require("./routes/authentication/users");
 const productCategoryRoute = require("./routes/products/categories");
+const chatbotRoutes = require("./routes/chat/chatbotRoutes");
 
 // Root route
 app.get("/", (req, res) => {
@@ -42,6 +43,7 @@ app.use("/api/permission", permissionRoute);
 app.use("/api/users", userRoute); 
 app.use("/api/category", productCategoryRoute); 
 app.use("/api/uploads", express.static(path.join(__dirname, "uploads")));
+app.use("/api", chatbotRoutes);
 
 // Start the server
 app.listen(PORT, () => {

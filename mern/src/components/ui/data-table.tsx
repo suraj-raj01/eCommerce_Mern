@@ -130,7 +130,7 @@ export function DataTable<TData, TValue>({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Toggle View</DropdownMenuLabel>
+              <DropdownMenuLabel>Manage View</DropdownMenuLabel>
               <DropdownMenuSeparator />
               {table.getAllColumns().filter((col) => col.getCanHide()).map((column) => (
                 <DropdownMenuCheckboxItem
@@ -199,8 +199,6 @@ export function DataTable<TData, TValue>({
                             />
                           );
                         }
-
-
                         return flexRender(cell.column.columnDef.cell, cell.getContext());
                       })()}
                     </TableCell>

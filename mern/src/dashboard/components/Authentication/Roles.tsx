@@ -31,6 +31,7 @@ import {
   FormMessage,
 } from "../../../components/ui/form"
 import { Checkbox } from "../../../components/ui/checkbox"
+import api from '../../../API'
 
 type Permission = {
   _id: string
@@ -61,8 +62,6 @@ export default function Roles() {
   const [searchQuery, setSearchQuery] = useState<string>('')
   const [open, setOpen] = useState(false)
   const [editing, setEditing] = useState<Roles | null>(null)
-
-  const api = 'http://localhost:8000/api'
 
   const form = useForm<FormValues>({
     defaultValues: {
@@ -231,7 +230,7 @@ export default function Roles() {
               </Badge>
             ))}
             {permissions.length > 3 && (
-              <Badge variant="secondary" className='text-xs'>
+              <Badge variant="secondary" className='text-xs rounded-xs'>
                 +{permissions.length - 3} more
               </Badge>
             )}
@@ -305,7 +304,7 @@ export default function Roles() {
         {loading ? (
           <Skeleton className="h-10 w-32" />
         ) : (
-          <Button onClick={handleCreate}>Create Role</Button>
+          <Button onClick={handleCreate}>Create New Role</Button>
         )}
       </div>
 

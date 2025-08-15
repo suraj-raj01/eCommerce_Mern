@@ -193,7 +193,7 @@ const Createuser = () => {
 
                     <div className="grid gap-2">
                         <Label>Select role</Label>
-                        <Select value={formData.roleId} onValueChange={handleRoleChange} required>
+                        <Select value={formData.roleId} onValueChange={handleRoleChange}>
                             <SelectTrigger className="w-full">
                                 <SelectValue placeholder="Select a role" />
                             </SelectTrigger>

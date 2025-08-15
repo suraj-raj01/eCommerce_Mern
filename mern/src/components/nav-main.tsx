@@ -36,7 +36,7 @@ export function NavMain({
 }) {
   return (
     <SidebarGroup>
-      <SidebarGroupLabel className="font-bold text-sm mb-2">Dashboard</SidebarGroupLabel>
+      {/* <SidebarGroupLabel className="font-bold text-sm"></SidebarGroupLabel> */}
       <SidebarMenu>
         {items.map((item) => (
           <Collapsible key={item.title} asChild defaultOpen={item.isActive}>

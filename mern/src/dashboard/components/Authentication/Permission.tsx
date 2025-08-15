@@ -237,7 +237,7 @@ export default function Permission() {
         {loading ? (
           <Skeleton className="h-10 w-32" />
         ) : (
-          <Button onClick={handleCreate}>Add Permission</Button>
+          <Button onClick={handleCreate}>Add New Permission</Button>
         )}
       </div>
 

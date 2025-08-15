@@ -238,7 +238,6 @@ export default function User() {
       header: "Roles",
       cell: ({ row }) => {
         const userRoles = getUserRoles(row.original)
-        console.log(userRoles,"userroles")
         if (userRoles.length === 0) {
           return <Badge variant="secondary">No roles</Badge>
         }
@@ -250,7 +249,7 @@ export default function User() {
               </Badge>
             ))}
             {userRoles.length > 2 && (
-              <Badge variant="secondary" className="text-xs">
+              <Badge variant="secondary" className="text-xs rounded-xs">
                 +{userRoles.length - 2} more
               </Badge>
             )}

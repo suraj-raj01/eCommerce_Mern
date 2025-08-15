@@ -15,8 +15,11 @@ import { ModeToggle } from "../../Theme"
 // import { useNavigate } from "react-router-dom"
 import { useEffect, useState } from "react"
 import Swal from "sweetalert2"
+import { Avatar, AvatarImage } from "../../components/ui/avatar"
+import api from "../../API"
 const Header = () => {
     const [email, setEmail] = useState('')
+    const [image, setImage] = useState('')
 
     // const router = useNavigate();
     const logout = () => {
@@ -41,6 +44,7 @@ const Header = () => {
         if (user) {
             const parsedUser = JSON.parse(user);
             setEmail(parsedUser?.user.name)
+            setImage(parsedUser?.user.profile)
             // console.log(parsedUser, "User from localStorage");
         } else {
             console.log("No user in localStorage");
@@ -71,6 +75,9 @@ const Header = () => {
                     </Breadcrumb>
                 </section>
                 <section className="flex items-center justify-center gap-2">
+                    <Avatar className="w-7 h-7">
+                        <AvatarImage src={`${api}/uploads/${image}`} />
+                    </Avatar>
                     {email}
                     <ModeToggle />
                     <LogOut onClick={logout} className=" dark:bg-white cursor-pointer dark:text-red-600 bg-red-600 text-white h-8 w-8 p-2 rounded-full border-1" />
