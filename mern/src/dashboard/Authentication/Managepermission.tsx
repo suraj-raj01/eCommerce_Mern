@@ -1,15 +1,15 @@
 import { useEffect, useState } from 'react'
-import { Button } from '../../../components/ui/button'
+import { Button } from '../../components/ui/button'
 import { ChevronDown, ChevronUp, User, Loader2 } from 'lucide-react'
-import { Badge } from '../../../components/ui/badge'
-import { Checkbox } from "../../../components/ui/checkbox"
-import { Card, CardContent, CardHeader, CardTitle } from "../../../components/ui/card"
+import { Badge } from '../../components/ui/badge'
+import { Checkbox } from "../../components/ui/checkbox"
+import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card"
 import {
   Collapsible,
   CollapsibleContent,
-} from "../../../components/ui/collapsible"
+} from "../../components/ui/collapsible"
 import axios from 'axios'
-import api from '../../../API'
+import api from '../../API'
 import Swal from 'sweetalert2'
 import { useNavigate } from 'react-router-dom'
 
@@ -251,9 +251,6 @@ export default function Roles() {
                             ? "bg-primary/5 border"
                             : "hover:bg-muted/40"
                             }`}
-                          onClick={() =>
-                            togglePermission(role._id, permission._id)
-                          }
                         >
                           <div className="flex items-start gap-3">
                             <Checkbox

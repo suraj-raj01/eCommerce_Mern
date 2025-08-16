@@ -1,18 +1,18 @@
 import { useEffect, useState } from 'react'
 import { type ColumnDef } from '@tanstack/react-table'
 import axios from 'axios'
-import { DataTable } from '../../../components/ui/data-table'
+import { DataTable } from '../../components/ui/data-table'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "../../../components/ui/dropdown-menu"
-import { Button } from '../../../components/ui/button'
+} from "../../components/ui/dropdown-menu"
+import { Button } from '../../components/ui/button'
 import { Trash, Edit, MoreHorizontal } from 'lucide-react'
 import Swal from 'sweetalert2'
-import { Skeleton } from '../../../components/ui/skeleton'
-import api from "../../../API"
+import { Skeleton } from '../../components/ui/skeleton'
+import api from "../../API"
 import { useForm } from "react-hook-form"
 import {
   Dialog,
@@ -20,7 +20,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from "../../../components/ui/dialog"
+} from "../../components/ui/dialog"
 import {
   Form,
   FormControl,
@@ -28,9 +28,9 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "../../../components/ui/form"
-import { Input } from '../../../components/ui/input'
-import { Textarea } from '../../../components/ui/textarea'
+} from "../../components/ui/form"
+import { Input } from '../../components/ui/input'
+import { Textarea } from '../../components/ui/textarea'
 
 type Permission = {
   _id: any

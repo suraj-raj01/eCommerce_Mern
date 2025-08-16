@@ -1,17 +1,17 @@
 import { useEffect, useState } from 'react'
 import { type ColumnDef } from '@tanstack/react-table'
 import axios from 'axios'
-import { DataTable } from '../../../components/ui/data-table'
+import { DataTable } from '../../components/ui/data-table'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "../../../components/ui/dropdown-menu"
-import { Button } from '../../../components/ui/button'
+} from "../../components/ui/dropdown-menu"
+import { Button } from '../../components/ui/button'
 import { Trash, Edit, MoreHorizontal, UserCircle, Eye } from 'lucide-react'
 import Swal from 'sweetalert2'
-import { Skeleton } from '../../../components/ui/skeleton'
+import { Skeleton } from '../../components/ui/skeleton'
 import { useNavigate } from 'react-router-dom'
 import {
   Dialog,
@@ -19,9 +19,9 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "../../../components/ui/dialog"
-import { Badge } from '../../../components/ui/badge'
-import { Avatar, AvatarFallback, AvatarImage } from '../../../components/ui/avatar'
+} from "../../components/ui/dialog"
+import { Badge } from '../../components/ui/badge'
+import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar'
 import { useForm } from "react-hook-form"
 import {
   Form,
@@ -30,9 +30,9 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "../../../components/ui/form"
-import { Checkbox } from "../../../components/ui/checkbox"
-import api from "../../../API"
+} from "../../components/ui/form"
+import { Checkbox } from "../../components/ui/checkbox"
+import api from "../../API"
 
 type Role = {
   _id: string
@@ -288,7 +288,7 @@ export default function User() {
                   onClick={() => deleteUser(item._id)}
                 >
                   <Trash className="mr-2 h-4 w-4" />
-                  Delete
+                  Delete User
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

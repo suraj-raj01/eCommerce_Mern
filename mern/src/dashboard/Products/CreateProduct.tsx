@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
-import { Button } from "../../../components/ui/button"
-import { Skeleton } from "../../../components/ui/skeleton"
+import { Button } from "../../components/ui/button"
+import { Skeleton } from "../../components/ui/skeleton"
 import { useNavigate } from "react-router-dom"
 
 const CreateProduct = () => {

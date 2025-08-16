@@ -1,12 +1,12 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import api from "../../../../API";
+import api from "../../../API";
 import { Label } from "@radix-ui/react-dropdown-menu";
-import { Input } from "../../../../components/ui/input";
-import { Button } from "../../../../components/ui/button";
+import { Input } from "../../../components/ui/input";
+import { Button } from "../../../components/ui/button";
 import { Plus } from "lucide-react";
-import { Card } from "../../../../components/ui/card";
+import { Card } from "../../../components/ui/card";
 
 const EditCategory = () => {
     const { id } = useParams();

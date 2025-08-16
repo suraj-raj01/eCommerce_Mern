@@ -1,26 +1,26 @@
 import { useEffect, useState } from 'react'
 import { type ColumnDef } from '@tanstack/react-table'
 import axios from 'axios'
-import { DataTable } from '../../../components/ui/data-table'
+import { DataTable } from '../../components/ui/data-table'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "../../../components/ui/dropdown-menu"
-import { Button } from '../../../components/ui/button'
-import { Trash, Edit, MoreHorizontal, Eye } from 'lucide-react'
+} from "../../components/ui/dropdown-menu"
+import { Button } from '../../components/ui/button'
+import { Trash, Edit, MoreHorizontal } from 'lucide-react'
 import Swal from 'sweetalert2'
-import { Skeleton } from '../../../components/ui/skeleton'
+import { Skeleton } from '../../components/ui/skeleton'
 import {
   Dialog,
   DialogContent,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "../../../components/ui/dialog"
-import { Input } from "../../../components/ui/input"
-import { Badge } from '../../../components/ui/badge'
+} from "../../components/ui/dialog"
+import { Input } from "../../components/ui/input"
+import { Badge } from '../../components/ui/badge'
 import { useForm } from "react-hook-form"
 import {
   Form,
@@ -29,9 +29,9 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "../../../components/ui/form"
-import { Checkbox } from "../../../components/ui/checkbox"
-import api from '../../../API'
+} from "../../components/ui/form"
+import { Checkbox } from "../../components/ui/checkbox"
+import api from '../../API'
 
 type Permission = {
   _id: string
@@ -253,10 +253,6 @@ export default function Roles() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem>
-                  <Eye className="mr-2 h-4 w-4" />
-                  View role
-                </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => handleEdit(item)}>
                   <Edit className="mr-2 h-4 w-4" />
                   Edit role

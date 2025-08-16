@@ -1,20 +1,20 @@
 import { useEffect, useState } from 'react'
 import { type ColumnDef } from '@tanstack/react-table'
 import axios from 'axios'
-import { DataTable } from '../../../../components/ui/data-table'
+import { DataTable } from '../../../components/ui/data-table'
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
-} from "../../../../components/ui/dropdown-menu"
-import { Button } from '../../../../components/ui/button'
+} from "../../../components/ui/dropdown-menu"
+import { Button } from '../../../components/ui/button'
 import { Trash, Edit, MoreHorizontal, Eye } from 'lucide-react'
 import Swal from 'sweetalert2'
-import { Skeleton } from '../../../../components/ui/skeleton'
-import { Badge } from '../../../../components/ui/badge'
+import { Skeleton } from '../../../components/ui/skeleton'
+import { Badge } from '../../../components/ui/badge'
 import { useNavigate } from 'react-router-dom'
-import api from "../../../../API"
+import api from "../../../API"
 
 type Category = {
     subcategories: any

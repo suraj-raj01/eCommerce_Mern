@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useMemo } from 'react';
-import defineAbilityFor from '../abilities/defineAbility';
+import defineAbilityFor from './defineAbility';
 
 const AbilityContext = createContext();
 

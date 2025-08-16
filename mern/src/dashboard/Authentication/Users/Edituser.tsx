@@ -1,16 +1,16 @@
 import { useEffect, useState } from "react";
-import { Input } from "../../../../components/ui/input"
-import { Label } from "../../../../components/ui/label"
+import { Input } from "../../../components/ui/input"
+import { Label } from "../../../components/ui/label"
 import {
     Select,
     SelectContent,
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from "../../../../components/ui/select";
+} from "../../../components/ui/select";
 import axios from "axios";
-import { Button } from "../../../../components/ui/button";
-import { Skeleton } from "../../../../components/ui/skeleton";
+import { Button } from "../../../components/ui/button";
+import { Skeleton } from "../../../components/ui/skeleton";
 import { useNavigate, useParams } from "react-router-dom";
 import { User } from "lucide-react";
 import Swal from "sweetalert2";
@@ -25,7 +25,7 @@ type Users = {
     profile: string
     roleId: string
 }
-import api from "../../../../API";
+import api from "../../../API";
 
 const Edituser = () => {
     const [formData, setFormData] = useState({

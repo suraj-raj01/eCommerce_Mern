@@ -1,16 +1,15 @@
 import * as React from "react"
 import {
-  BookOpen,
-  Bot,
-  Command,
+  MonitorCog,
+  ShoppingBag ,
   Frame,
   LayoutDashboardIcon,
   LifeBuoy,
   Map,
   PieChart,
   Send,
-  Settings2,
-  User2Icon,
+  ShieldUser,
+  Shield ,
 } from "lucide-react"
 
 import { NavMain } from "../components/nav-main"
@@ -37,7 +36,7 @@ const data = {
     {
       title: "Authentication",
       url: "/dashboard",
-      icon: User2Icon,
+      icon: Shield,
       isActive: true,
       items: [
         {
@@ -61,7 +60,7 @@ const data = {
     {
       title: "Products",
       url: "#",
-      icon: Bot,
+      icon: ShoppingBag ,
       items: [
         {
           title: "Categories",
@@ -72,46 +71,38 @@ const data = {
           url: "/dashboard/products",
         },
         {
-          title: "Quantum",
-          url: "#",
+          title: "Brands",
+          url: "/dashboard/brands",
         },
       ],
     },
     {
-      title: "Documentation",
+      title: "Sitesettings",
       url: "#",
-      icon: BookOpen,
+      icon: MonitorCog,
       items: [
         {
-          title: "Introduction",
-          url: "#",
+          title: "Sitesettings",
+          url: "/dashboard/sitesettings",
         },
         {
-          title: "Get Started",
-          url: "#",
-        },
-        {
-          title: "Tutorials",
-          url: "#",
-        },
-        {
-          title: "Changelog",
-          url: "#",
+          title: "Manage Sitesetting",
+          url: "/dashboard/managesitesetting",
         },
       ],
     },
     {
-      title: "Settings",
+      title: "Subscriptions",
       url: "#",
-      icon: Settings2,
+      icon: ShieldUser,
       items: [
         {
-          title: "General",
-          url: "#",
+          title: "Plans",
+          url: "/dashboard/plans",
         },
         {
           title: "Team",
-          url: "#",
+          url: "/dashboard/team",
         },
         {
           title: "Billing",

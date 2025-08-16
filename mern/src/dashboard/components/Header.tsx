@@ -60,7 +60,7 @@ const Header = () => {
                         orientation="vertical"
                         className="mr-2 data-[orientation=vertical]:h-4"
                     />
-                    <Breadcrumb>
+                    {/* <Breadcrumb>
                         <BreadcrumbList>
                             <BreadcrumbItem className="hidden md:block">
                                 <BreadcrumbLink href="#">
@@ -72,7 +72,7 @@ const Header = () => {
                                 <BreadcrumbPage>Data Analyzer</BreadcrumbPage>
                             </BreadcrumbItem>
                         </BreadcrumbList>
-                    </Breadcrumb>
+                    </Breadcrumb> */}
                 </section>
                 <section className="flex items-center justify-center gap-2">
                     <Avatar className="w-7 h-7">

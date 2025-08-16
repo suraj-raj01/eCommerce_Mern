@@ -1,12 +1,21 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Input } from "../components/ui/input";
 import { ScrollArea } from "../components/ui/scroll-area";
-import { Avatar, AvatarFallback } from "../components/ui/avatar";
-import { Loader2, Send, Bot, User, Delete, Trash2Icon } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
+import { Loader2, Send, Bot, User, Trash2Icon, EllipsisVertical } from "lucide-react";
 import api from "../API";
 import axios from "axios";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "../components/ui/dropdown-menu"
+import Swal from "sweetalert2";
 
 interface ChatMessage {
   role: "user" | "bot";
@@ -18,26 +27,40 @@ export default function ChatUI() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
+  const [token, setToken] = useState('')
+  const [profile, setProfile] = useState('')
+
+  useEffect(() => {
+    const user = localStorage.getItem('user');
+    if (user) {
+      const parsedUser = JSON.parse(user);
+      setToken(parsedUser?.token)
+      setProfile(parsedUser?.user?.profile)
+      console.log(parsedUser?.user.profile, "User from localStorage");
+    } else {
+      console.log("No user in localStorage");
+    }
+  }, []);
 
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
 
-    const userMsg: ChatMessage = { 
-      role: "user", 
+    const userMsg: ChatMessage = {
+      role: "user",
       message: input,
       timestamp: new Date()
     };
-    
+
     setMessages((prev) => [...prev, userMsg]);
     const currentInput = input;
     setInput("");
-    
+
     try {
       setIsLoading(true);
-      
+
       const res = await axios.post(`${api}/chat`, { message: currentInput });
-      const botMsg: ChatMessage = { 
-        role: "bot", 
+      const botMsg: ChatMessage = {
+        role: "bot",
         message: res.data.reply,
         timestamp: new Date()
       };
@@ -64,8 +87,8 @@ export default function ChatUI() {
   };
 
   const formatTime = (date: Date) => {
-    return date.toLocaleTimeString('en-US', { 
-      hour: '2-digit', 
+    return date.toLocaleTimeString('en-US', {
+      hour: '2-digit',
       minute: '2-digit',
       hour12: false
     });
@@ -75,7 +98,27 @@ export default function ChatUI() {
     try {
       await axios.delete(`${api}/clearchat`);
       setMessages([]);
-      alert("Chat cleared successfully");
+      Swal.fire({
+        title: "Are you sure?",
+        text: "This will clear the chat and you won’t be able to recover it!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, clear it!",
+        cancelButtonText: "Cancel"
+      }).then((result) => {
+        if (result.isConfirmed) {
+          // 👉 perform clear chat logic here
+          Swal.fire({
+            title: "Cleared!",
+            text: "Chat cleared successfully.",
+            icon: "success",
+            timer: 2000,
+            showConfirmButton: false
+          });
+        }
+      });
     } catch (error) {
       console.error("Error clearing chat:", error);
     }
@@ -83,6 +126,7 @@ export default function ChatUI() {
 
   return (
     <div className="w-full min-w-[300px] mx-auto p-2 h-140 mt-10 flex flex-col">
+      {/* <h1>{import.meta.env.VITE_API_URL}URL</h1> */}
       <Card className="flex-1 flex flex-col border-2">
         <CardHeader className="border-b ">
           <CardTitle className="flex items-center gap-3 sm:text-xs">
@@ -91,46 +135,57 @@ export default function ChatUI() {
             </div>
             AI Assistant
             <div className="ml-auto flex items-center gap-2 text-sm font-normal">
-            <Button variant='destructive' size='sm' className="ml-auto flex items-center gap-2 text-sm font-normal cursor-pointer" onClick={handleClearChat}>
-              <Trash2Icon className="w-4 h-4" />
-              Clear
-            </Button>
-            <Button variant='outline' size='sm' className=" ml-auto flex items-center gap-2 text-sm font-normal cursor-pointer">
+              <Button size='sm' className=" bg-transparent ml-auto text-foreground hover:bg-transparent font-bold flex items-center gap-2 text-sm cursor-pointer">
                 Online
               </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger>
+                  <EllipsisVertical className="w-4 h-4" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem>Profile</DropdownMenuItem>
+                  <DropdownMenuItem>History</DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleClearChat}>Clear chat</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </CardTitle>
         </CardHeader>
-        
+
         <CardContent className="flex-1 flex flex-col p-0 min-h-0">
           <ScrollArea className="flex-1 p-2">
             <div className="space-y-2">
               {messages.map((message, index) => (
                 <div
                   key={index}
-                  className={`flex gap-3 ${
-                    message.role === "user" ? "flex-row-reverse" : "flex-row"
-                  }`}
+                  className={`flex gap-3 ${message.role === "user" ? "flex-row-reverse" : "flex-row"
+                    }`}
                 >
                   <Avatar className="w-8 h-8 mt-1 border">
-                    <AvatarFallback className="text-xs">
-                      {message.role === "user" ? (
-                        <User className="w-4 h-4" />
+                    {message.role === "user" ? (
+                      token ? (
+                        <AvatarImage src={`${api}/uploads/${profile}`} alt="User profile" />
                       ) : (
+                        <AvatarFallback className="text-xs">
+                          <User className="w-4 h-4" />
+                        </AvatarFallback>
+                      )
+                    ) : (
+                      <AvatarFallback className="text-xs">
                         <Bot className="w-4 h-4" />
-                      )}
-                    </AvatarFallback>
+                      </AvatarFallback>
+                    )}
                   </Avatar>
-                  
-                  <div className={`max-w-[85%] ${
-                    message.role === "user" ? "text-right" : "text-left"
-                  }`}>
+
+                  <div className={`max-w-[85%] ${message.role === "user" ? "text-right" : "text-left"
+                    }`}>
                     <div
-                      className={`inline-block p-2 rounded-md border text-xs ${
-                        message.role === "user"
-                          ? "rounded-tr-sm"
-                          : "rounded-tl-sm"
-                      }`}
+                      className={`inline-block p-2 rounded-md border text-xs ${message.role === "user"
+                        ? "rounded-tr-sm"
+                        : "rounded-tl-sm"
+                        }`}
                     >
                       <p className="text-xs leading-relaxed">{message.message}</p>
                     </div>
@@ -140,7 +195,7 @@ export default function ChatUI() {
                   </div>
                 </div>
               ))}
-              
+
               {isLoading && (
                 <div className="flex gap-3">
                   <Avatar className="w-8 h-8 mt-1 border">
@@ -150,11 +205,11 @@ export default function ChatUI() {
                   </Avatar>
                   <div className="rounded-lg rounded-tl-sm p-4 border">
                     <div className="flex items-center gap-2">
-                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span className="text-xs">Thinking</span>
                       <div className="flex gap-1">
                         <div className="w-2 h-2 rounded-full border animate-bounce"></div>
-                        <div className="w-2 h-2 rounded-full border animate-bounce" style={{animationDelay: '0.1s'}}></div>
-                        <div className="w-2 h-2 rounded-full border animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                        <div className="w-2 h-2 rounded-full border animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                        <div className="w-2 h-2 rounded-full border animate-bounce" style={{ animationDelay: '0.2s' }}></div>
                       </div>
                     </div>
                   </div>
@@ -162,7 +217,7 @@ export default function ChatUI() {
               )}
             </div>
           </ScrollArea>
-          
+
           <div className="border-t p-2">
             <div className="flex gap-2 items-end">
               <div className="flex-1 relative">
