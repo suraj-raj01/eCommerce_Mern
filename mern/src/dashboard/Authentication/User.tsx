@@ -299,7 +299,7 @@ export default function User() {
   ]
 
   return (
-    <section className="p-3 w-full">
+    <section className="p-3">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-2">
         <div>
           {loading ? (

@@ -101,7 +101,7 @@ export function DataTable<TData, TValue>({
   }, [globalFilter, onSearch])
 
   return (
-    <div className="w-full space-y-4 overflow-hidden">
+    <div className="w-full space-y-4">
       {/* Top Controls */}
       <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
         {isLoading ? (
@@ -148,8 +148,8 @@ export function DataTable<TData, TValue>({
       </div>
 
       {/* Table with horizontal scroll for mobile */}
-      <div className="rounded-md border overflow-x-auto">
-        <Table className="min-w-full sm:min-w-[600px]">
+      <div className="rounded-md border">
+        <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>

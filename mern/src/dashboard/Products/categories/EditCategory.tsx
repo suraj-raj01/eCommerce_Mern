@@ -7,6 +7,7 @@ import { Input } from "../../../components/ui/input";
 import { Button } from "../../../components/ui/button";
 import { Plus } from "lucide-react";
 import { Card } from "../../../components/ui/card";
+import Swal from "sweetalert2";
 
 const EditCategory = () => {
     const { id } = useParams();
@@ -90,7 +91,12 @@ const EditCategory = () => {
                 headers: { "Content-Type": "application/json" },
             });
 
-            alert("Category updated successfully!");
+            Swal.fire({
+                title: "Success!",
+                text: "Category updated successfully!",
+                icon: "success",
+                confirmButtonText: "OK"
+            });
             navigate("/dashboard/categories")
             loadCategory();
         } catch (error) {
