@@ -8,7 +8,21 @@ const getChatResponse = async (req, res) => {
 
     const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" }); // change model name if needed
 
-    const result = await model.generateContent(message);
+const prompt = `
+You are a helpful assistant.
+Always answer in Markdown format.
+
+Format rules:
+### Title
+- Bullet point 1
+- Bullet point 2
+- Bullet point 3
+
+User message: ${message}
+`;
+
+
+const result = await model.generateContent(prompt);
 
     // Extract text safely
     let botReply = "";
