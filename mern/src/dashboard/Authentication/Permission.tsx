@@ -215,8 +215,8 @@ export default function Permission() {
   }
 
   return (
-    <section className="p-2 sm:p-3 w-full">
-      <div className="flex flex-col sm:flex-row w-full sm:justify-between sm:items-center gap-3 mb-4">
+    <section className="p-3">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-2">
         <div>
           {loading ? (
             <>

@@ -278,7 +278,7 @@ export default function Roles() {
 
   return (
     <div className="p-3">
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-2">
         <div>
           {loading ? (
             <>
@@ -286,22 +286,23 @@ export default function Roles() {
               <Skeleton className="h-5 w-48" />
             </>
           ) : (
-            <>
-              <div>
-                <h1 className="text-3xl font-bold tracking-tight">Roles</h1>
-                <p className="text-muted-foreground">
-                  Manage and track all the roles
-                </p>
-              </div>
-            </>
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Roles</h1>
+              <p className="text-sm sm:text-base text-muted-foreground">
+                Manage and track all the roles
+              </p>
+            </div>
           )}
         </div>
         {loading ? (
           <Skeleton className="h-10 w-32" />
         ) : (
-          <Button onClick={handleCreate}>Create New Role</Button>
+          <Button size="sm" onClick={handleCreate} className="w-full sm:w-auto">
+            Create New Role
+          </Button>
         )}
       </div>
+
 
       <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) resetForm(); }}>
         <DialogContent className="sm:max-w-md max-h-[80vh] overflow-y-auto">
@@ -401,9 +402,9 @@ export default function Roles() {
               />
 
               <DialogFooter className="gap-2">
-                <Button 
-                  type="button" 
-                  variant="outline" 
+                <Button
+                  type="button"
+                  variant="outline"
                   onClick={() => { setOpen(false); resetForm(); }}
                 >
                   Cancel
@@ -417,15 +418,18 @@ export default function Roles() {
         </DialogContent>
       </Dialog>
 
-      <DataTable
-        columns={columns}
-        data={roles}
-        pageCount={pageCount}
-        currentPage={page}
-        onPageChange={setPage}
-        onSearch={handleSearch}
-        isLoading={loading}
-      />
+      <div className="w-full overflow-x-auto">
+        <DataTable
+          columns={columns}
+          data={roles}
+          pageCount={pageCount}
+          currentPage={page}
+          onPageChange={setPage}
+          onSearch={handleSearch}
+          isLoading={loading}
+        />
+      </div>
+
     </div>
   )
 }

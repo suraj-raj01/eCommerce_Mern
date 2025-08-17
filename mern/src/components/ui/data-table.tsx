@@ -32,8 +32,7 @@ import { ChevronDown } from 'lucide-react'
 import { Skeleton } from '../../components/ui/skeleton'
 import api from "../../API"
 
-
-// Table skeleton rows component
+// ✅ Table skeleton rows component
 const TableSkeleton = ({ columns, rows = 5 }: { columns: number; rows?: number }) => (
   <>
     {Array.from({ length: rows }).map((_, rowIndex) => (
@@ -55,7 +54,7 @@ interface DataTableProps<TData, TValue> {
   currentPage: number
   onPageChange: (page: number) => void
   onSearch?: (query: string) => void
-  isLoading?: boolean // Add loading prop
+  isLoading?: boolean
 }
 
 export function DataTable<TData, TValue>({
@@ -102,7 +101,7 @@ export function DataTable<TData, TValue>({
   }, [globalFilter, onSearch])
 
   return (
-    <div className="w-full space-y-4">
+    <div className="w-full space-y-4 overflow-hidden">
       {/* Top Controls */}
       <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
         {isLoading ? (
@@ -125,18 +124,20 @@ export function DataTable<TData, TValue>({
                 Columns <ChevronDown className="ml-2 h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
+            <DropdownMenuContent
+              align="end"
+              className="max-w-[95vw]" // ✅ prevent overflow on small devices
+            >
               <DropdownMenuLabel>Manage View</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              {table.getAllColumns()
+              {table
+                .getAllColumns()
                 .filter((col) => col.getCanHide())
                 .map((column) => (
                   <DropdownMenuCheckboxItem
                     key={column.id}
                     checked={column.getIsVisible()}
-                    onCheckedChange={(value) =>
-                      column.toggleVisibility(!!value)
-                    }
+                    onCheckedChange={(value) => column.toggleVisibility(!!value)}
                   >
                     {column.id}
                   </DropdownMenuCheckboxItem>
@@ -148,7 +149,7 @@ export function DataTable<TData, TValue>({
 
       {/* Table with horizontal scroll for mobile */}
       <div className="rounded-md border overflow-x-auto">
-        <Table className="min-w-[600px]"> {/* Ensures scroll on small screens */}
+        <Table className="min-w-full sm:min-w-[600px]">
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
@@ -188,13 +189,15 @@ export function DataTable<TData, TValue>({
                             imageUrl = `${api}/uploads/${cellValue}`
                           }
                           return (
-                            <img
-                              src={imageUrl}
-                              alt="Image"
-                              width={40}
-                              height={40}
-                              className="object-cover rounded-full"
-                            />
+                            <div className="shrink-0">
+                              <img
+                                src={imageUrl}
+                                alt="Image"
+                                width={40}
+                                height={40}
+                                className="object-cover rounded-full"
+                              />
+                            </div>
                           )
                         }
                         return flexRender(cell.column.columnDef.cell, cell.getContext())
@@ -224,7 +227,7 @@ export function DataTable<TData, TValue>({
           </>
         ) : (
           <>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap justify-center sm:justify-start gap-2">
               <Button
                 variant="outline"
                 size="sm"

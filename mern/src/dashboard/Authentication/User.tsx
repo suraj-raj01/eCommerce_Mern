@@ -300,7 +300,7 @@ export default function User() {
 
   return (
     <section className="p-3 w-full">
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-2">
         <div>
           {loading ? (
             <>
@@ -477,15 +477,17 @@ export default function User() {
         </DialogContent>
       </Dialog>
 
-      <DataTable
-        columns={columns}
-        data={users}
-        pageCount={pageCount}
-        currentPage={page}
-        onPageChange={setPage}
-        onSearch={handleSearch}
-        isLoading={loading}
-      />
+      <div className="w-full overflow-x-auto">
+        <DataTable
+          columns={columns}
+          data={users}
+          pageCount={pageCount}
+          currentPage={page}
+          onPageChange={setPage}
+          onSearch={handleSearch}
+          isLoading={loading}
+        />
+      </div>
     </section>
   )
 }

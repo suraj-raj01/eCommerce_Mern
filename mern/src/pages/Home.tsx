@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card"
 import { Input } from "../components/ui/input";
 import { ScrollArea } from "../components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
-import { Loader2, Send, Bot, User, Trash2Icon, EllipsisVertical } from "lucide-react";
+import { Loader2, Send, Bot, User, EllipsisVertical } from "lucide-react";
 import api from "../API";
 import axios from "axios";
 import {
@@ -59,9 +59,16 @@ export default function ChatUI() {
       setIsLoading(true);
 
       const res = await axios.post(`${api}/chat`, { message: currentInput });
+      let rawReply = res.data.reply;
+      rawReply = rawReply
+        .replace(/```[a-z]*\n?/gi, "")   // remove ```cpp or ```js
+        .replace(/```/g, "")             // remove closing ```
+        .replace(/\*\*Explanation:[\s\S]*/i, "") // cut off explanation if exists
+        .trim();
+
       const botMsg: ChatMessage = {
         role: "bot",
-        message: res.data.reply,
+        message: rawReply,
         timestamp: new Date()
       };
       console.log(botMsg, "botmsg");
@@ -187,7 +194,7 @@ export default function ChatUI() {
                         : "rounded-tl-sm"
                         }`}
                     >
-                      <p className="text-xs leading-relaxed">{message.message}</p>
+                      <pre className="text-xs leading-relaxed font-semibold">{message.message}</pre>
                     </div>
                     <p className="text-xs mt-1 px-2">
                       {formatTime(message.timestamp)}
