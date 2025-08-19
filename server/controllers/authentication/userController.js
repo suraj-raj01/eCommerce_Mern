@@ -140,8 +140,34 @@ const deleteUser = async (req, res) => {
     }
 };
 
+const verifyEmail = async(req, res) => {
+    const { email } = req.body;
+    try {
+        const user = await UserModel.findOne({ email });
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        res.status(200).json({ message: "Email verified successfully" });
+    } catch (error) {
+        res.status(500).json({ message: "Something went wrong", error: error.message });
+    }
+}
 
-
+const forgotPassword = async (req, res) => {
+    const { email } = req.body;
+    try {
+        const user = await UserModel.findOne({ email });
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        // Generate a password reset token and send it to the user's email
+        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "15m" });
+        await sendPasswordResetEmail(user.email, token);
+        res.status(200).json({ message: "Password reset email sent successfully" });
+    } catch (error) {
+        res.status(500).json({ message: "Something went wrong", error: error.message });
+    }
+};
 
 const JWT_SECRET = process.env.JWT_SECRET || "yourSecretKey"; 
 const userLogin = async (req, res) => {
@@ -191,5 +217,7 @@ module.exports = {
     searchUser,
     updateUser,
     deleteUser,
-    userLogin
+    userLogin,
+    verifyEmail,
+    forgotPassword
 }

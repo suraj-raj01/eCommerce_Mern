@@ -18,6 +18,7 @@ import Createuser from "./dashboard/Authentication/Users/Createuser"
 import Edituser from "./dashboard/Authentication/Users/Edituser"
 import Managepermission from "./dashboard/Authentication/Managepermission"
 import PageNotFound from "./PageNotFound"
+import { ForgetPassword } from "./Auth/ForgetPassword"
 const App = () => {
   return (
     <main>
@@ -28,6 +29,7 @@ const App = () => {
           <Route path="home" element={<Home/>}/>
           <Route path="about" element={<About/>}/>
           <Route path="login" element={<LoginPage/>}/>
+          <Route path="forgetpassword" element={<ForgetPassword/>}/>
           <Route path="*" element={<PageNotFound/>}/>
         </Route>
 

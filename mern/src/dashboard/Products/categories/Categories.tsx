@@ -85,71 +85,73 @@ export default function Category() {
     const columns: ColumnDef<Category>[] = [
         {
             accessorKey: 'category',
-            header: "Category Name"
+            header: "Category Name",
         },
         {
             accessorKey: 'subcategory',
             header: "Subcategories",
             cell: ({ row }) => {
+                const subcategories = row.original.subcategories || []
+                const isMobile = window.innerWidth < 640
+                const visibleSubcategories = isMobile ? subcategories.slice(0, 2) : subcategories
+
                 return (
-                    <div className='flex items-center justify-start gap-2'>
-                        {row.original.subcategories.map((subcat: Category) => (
-                            <section key={subcat._id} >
-                                <Badge variant='outline' className='rounded-xs text-xs'>
-                                    {subcat.name}
-                                </Badge>
-                            </section>
+                    <div className="flex flex-wrap gap-1 items-center">
+                        {visibleSubcategories.map((subcat: Category) => (
+                            <Badge key={subcat._id} variant="outline" className="rounded-xs text-xs">
+                                {subcat.name}
+                            </Badge>
                         ))}
+
+                        {/* Show +N on mobile if more subcategories exist */}
+                        {isMobile && subcategories.length > 2 && (
+                            <Badge variant="secondary" className="rounded-xs text-xs">
+                                +{subcategories.length - 2}
+                            </Badge>
+                        )}
                     </div>
                 )
             },
         },
+
         {
             header: "Action",
             id: "actions",
-            cell: ({ row }) => {
-                const item = row.original
-                return (
-                    <div className='flex items-center justify-start gap-1'>
-
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" className="h-8 w-8 p-0">
-                                    <span className="sr-only">Open menu</span>
-                                    <MoreHorizontal className="h-4 w-4" />
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-
-                                <DropdownMenuItem onClick={() => viewpage(item._id)}>
-                                    <Eye className="mr-2 h-4 w-4" />
-                                    View Category
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => navigate(`/dashboard/editcategory/${item._id}`)}>
-                                    <Edit className="mr-2 h-4 w-4" />
-                                    Edit Category
-                                </DropdownMenuItem>
-                                <DropdownMenuItem
-                                    onClick={() => deleteCategory(item._id)}
-                                >
-                                    <Trash className="mr-2 h-4 w-4" />
-                                    Delete
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                    </div>
-                )
-            },
+            cell: ({ row }) => (
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="h-8 w-8 p-0 sm:h-auto sm:w-auto sm:px-2">
+                            <MoreHorizontal className="h-4 w-4" />
+                            {/* <span className="hidden sm:inline">Actions</span> */}
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={() => viewpage(row.original._id)}>
+                            <Eye className="mr-2 h-4 w-4" />
+                            View Category
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => navigate(`/dashboard/editcategory/${row.original._id}`)}>
+                            <Edit className="mr-2 h-4 w-4" />
+                            Edit Category
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => deleteCategory(row.original._id)}>
+                            <Trash className="mr-2 h-4 w-4" />
+                            Delete
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+            ),
         },
     ]
+
 
     const handleSearch = (query: string) => {
         setSearchQuery(query)
     }
 
     return (
-        <div className="p-3">
-            <div className="flex justify-between items-center mb-4">
+        <section className="p-3">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-2">
                 <div>
                     {loading ? (
                         <>
@@ -159,7 +161,7 @@ export default function Category() {
                     ) : (
                         <>
                             <div>
-                                <h1 className="text-3xl font-bold tracking-tight">Category</h1>
+                                <h1 className="text-3xl font-bold tracking-tight">Categories</h1>
                                 <p className="text-muted-foreground">
                                     Manage and track all the categories
                                 </p>
@@ -170,21 +172,23 @@ export default function Category() {
                 {loading ? (
                     <Skeleton className="h-10 w-32" />
                 ) : (
-                    <Button onClick={() => {navigate("/dashboard/createcategory")}}>
+                    <Button onClick={() => { navigate("/dashboard/createcategory") }}>
                         Create Category
                     </Button>
                 )}
             </div>
 
-            <DataTable
-                columns={columns}
-                data={categories}
-                pageCount={pageCount}
-                currentPage={page}
-                onPageChange={setPage}
-                onSearch={handleSearch}
-                isLoading={loading}
-            />
-        </div>
+            <div className="w-full overflow-x-auto">
+                <DataTable
+                    columns={columns}
+                    data={categories}
+                    pageCount={pageCount}
+                    currentPage={page}
+                    onPageChange={setPage}
+                    onSearch={handleSearch}
+                    isLoading={loading}
+                />
+            </div>
+        </section>
     )
 }

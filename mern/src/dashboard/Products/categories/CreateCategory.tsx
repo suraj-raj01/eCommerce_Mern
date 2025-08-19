@@ -137,7 +137,7 @@ const CreateCategory = () => {
                                             type="button"
                                             variant="destructive"
                                             size="sm"
-                                            className="px-4 py-2 text-sm"
+                                            className="px-4 py-2 text-sm w-full"
                                             onClick={() => handleRemoveSubcategory(index)}
                                         >
                                             Remove

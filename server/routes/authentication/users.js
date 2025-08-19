@@ -19,4 +19,6 @@ route.post("/searchuser/:id",userController.searchUser)
 route.patch("/updateuser/:id",upload.single("profile"),userController.updateUser)
 route.delete("/deleteuser/:id",userController.deleteUser)
 route.post("/login",userController.userLogin)
+route.post("/verify-email",userController.verifyEmail)
+route.post("/forgot-password",userController.forgotPassword)
 module.exports = route;

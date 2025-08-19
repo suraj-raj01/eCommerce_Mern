@@ -78,7 +78,7 @@ export function LoginForm({
                 <div className="flex items-center">
                   <Label htmlFor="password">Password</Label>
                   <Link
-                    to="/forgot-password"
+                    to="/forgetpassword"
                     className="ml-auto font-semibold text-sm underline-offset-2 hover:underline"
                   >
                     Forgot your password?
@@ -140,7 +140,7 @@ export function LoginForm({
         </CardContent>
       </Card>
       <div className="text-muted-foreground *:[a]:hover:text-primary text-center text-xs text-balance *:[a]:underline *:[a]:underline-offset-4">
-        By clicking continue, you agree to our <a href="#">Terms of Service</a>{" "}
+        By clicking continue, you agree to our <Link to="#">Terms of Service</Link>{" "}
         and <a href="#">Privacy Policy</a>.
       </div>
     </div>
