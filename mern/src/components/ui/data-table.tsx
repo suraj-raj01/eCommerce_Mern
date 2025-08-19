@@ -38,8 +38,8 @@ const TableSkeleton = ({ columns, rows = 5 }: { columns: number; rows?: number }
     {Array.from({ length: rows }).map((_, rowIndex) => (
       <TableRow key={`skeleton-${rowIndex}`}>
         {Array.from({ length: columns }).map((_, colIndex) => (
-          <TableCell key={`skeleton-cell-${rowIndex}-${colIndex}`} className="py-4">
-            <Skeleton className="h-4 w-full" />
+          <TableCell key={`skeleton-cell-${rowIndex}-${colIndex}`} className="py-2 sm:py-4">
+            <Skeleton className="h-3 sm:h-4 w-full" />
           </TableCell>
         ))}
       </TableRow>
@@ -101,7 +101,7 @@ export function DataTable<TData, TValue>({
   }, [globalFilter, onSearch])
 
   return (
-    <div className="w-full space-y-4">
+    <section className="space-y-4">
       {/* Top Controls */}
       <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
         {isLoading ? (
@@ -147,14 +147,78 @@ export function DataTable<TData, TValue>({
         )}
       </div>
 
-      {/* Table with horizontal scroll for mobile */}
-      <div className="rounded-md border">
-        <Table>
+      {/* Mobile Card View (only for mobile screens) */}
+      <div className="block sm:hidden">
+        {isLoading ? (
+          <div className="space-y-3">
+            {Array.from({ length: 5 }).map((_, index) => (
+              <div key={`mobile-skeleton-${index}`} className="border rounded-lg p-3 space-y-2">
+                <Skeleton className="h-4 w-3/4" />
+                <Skeleton className="h-3 w-1/2" />
+                <Skeleton className="h-3 w-2/3" />
+              </div>
+            ))}
+          </div>
+        ) : data.length > 0 ? (
+          <div className="space-y-3">
+            {table.getRowModel().rows.map((row, rowIndex) => (
+              <div 
+                key={rowIndex} 
+                className="border rounded-lg p-3 space-y-2 bg-card"
+                data-state={row.getIsSelected() && 'selected'}
+              >
+                {row.getVisibleCells().map((cell) => {
+                  const header = cell.column.columnDef.header as string
+                  const cellValue = cell.getValue()
+                  const isImage =
+                    typeof cellValue === 'string' &&
+                    (/\.(jpeg|jpg|png|gif|webp|svg)$/i.test(cellValue) ||
+                      cellValue.toLowerCase().startsWith('https') ||
+                      cellValue.startsWith('data:image'))
+
+                  return (
+                    <div key={cell.id} className="flex items-center justify-between text-sm">
+                      <span className="font-medium text-muted-foreground capitalize min-w-0 flex-shrink-0 mr-2">
+                        {typeof header === 'string' ? header.replace(/([A-Z])/g, ' $1').trim() : cell.column.id}:
+                      </span>
+                      <div className="flex-1 text-right min-w-0">
+                        {isImage ? (
+                          <div className="flex justify-end">
+                            <img
+                              src={/^https?:\/\//.test(cellValue as string) 
+                                ? cellValue as string 
+                                : `${api}/uploads/${cellValue}`}
+                              alt="Image"
+                              className="w-8 h-8 object-cover rounded-full"
+                            />
+                          </div>
+                        ) : (
+                          <span className="truncate block">
+                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="border rounded-lg p-8 text-center text-sm text-muted-foreground">
+            No results found
+          </div>
+        )}
+      </div>
+
+      {/* Table View (for tablet and desktop) */}
+      <div className="hidden sm:block w-full overflow-x-auto rounded-md border">
+        <Table className="min-w-[600px]"> {/* force min width so it scrolls */}
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id}>
+                  <TableHead key={header.id} className="whitespace-nowrap text-xs sm:text-sm">
                     {isLoading ? (
                       <Skeleton className="h-4 w-20" />
                     ) : header.isPlaceholder ? null : (
@@ -172,7 +236,10 @@ export function DataTable<TData, TValue>({
               table.getRowModel().rows.map((row) => (
                 <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                    <TableCell
+                      key={cell.id}
+                      className="whitespace-nowrap text-xs sm:text-sm"
+                    >
                       {(() => {
                         const cellValue = cell.getValue()
                         const isImage =
@@ -193,8 +260,8 @@ export function DataTable<TData, TValue>({
                               <img
                                 src={imageUrl}
                                 alt="Image"
-                                width={40}
-                                height={40}
+                                width={32}
+                                height={32}
                                 className="object-cover rounded-full"
                               />
                             </div>
@@ -208,7 +275,10 @@ export function DataTable<TData, TValue>({
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center">
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center text-xs sm:text-sm"
+                >
                   No results found
                 </TableCell>
               </TableRow>
@@ -251,6 +321,6 @@ export function DataTable<TData, TValue>({
           </>
         )}
       </div>
-    </div>
+    </section>
   )
 }

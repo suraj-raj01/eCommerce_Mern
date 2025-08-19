@@ -8,7 +8,7 @@ const getChatResponse = async (req, res) => {
 
     const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" }); // change model name if needed
 
-const prompt = `
+    const prompt = `
 You are a helpful assistant.
 Always answer in Markdown format.
 
@@ -22,7 +22,7 @@ User message: ${message}
 `;
 
 
-const result = await model.generateContent(prompt);
+    const result = await model.generateContent(prompt);
 
     // Extract text safely
     let botReply = "";
@@ -51,7 +51,7 @@ const clearChatHistory = async (req, res) => {
     res.status(500).json({ error: "Failed to clear chat history" });
   }
 };
- 
+
 module.exports = {
   getChatResponse,
   clearChatHistory

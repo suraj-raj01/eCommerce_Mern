@@ -15,7 +15,7 @@ const DashboardHome = () => {
                 Swal.fire("Access denied", "You must be logged in!", "error");
                 navigate("/login");
             } else {
-                console.log(token, "token");
+                // console.log(token, "token");
             }
         } else {
             Swal.fire("Access denied", "You must be logged in!", "error");

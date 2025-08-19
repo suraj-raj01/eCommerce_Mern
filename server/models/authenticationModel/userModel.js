@@ -24,6 +24,13 @@ const userSchema = new mongoose.Schema({
       require: false,
     },
   ],
+  chatId: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "ChatMessage",
+      require: false,
+    },
+  ],
 });
 
 module.exports = mongoose.models.users || mongoose.model("users", userSchema);

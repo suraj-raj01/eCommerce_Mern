@@ -29,15 +29,26 @@ const createUser = async (req, res) => {
     }
 };
 
-
 const getUsers = async (req, res) => {
-    try {
-        const users = await UserModel.find().populate('roleId')
-        res.status(200).json({ data: users, message: "user data fetched successfull" }, { status: 200 })
-    } catch (error) {
-        res.status(500).json({ message: "something went wrong", error: error.message }, { status: 500 })
-    }
-}
+  try {
+    const users = await UserModel.find()
+      .populate("roleId")
+      .populate("chatId");
+
+    res.status(200).json({
+      data: users,
+      message: "User data fetched successfully",
+      status: 200,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Something went wrong",
+      error: error.message,
+      status: 500,
+    });
+  }
+};
+
 
 const getUserById = async(req, res) => {
     const { id } = req.params;

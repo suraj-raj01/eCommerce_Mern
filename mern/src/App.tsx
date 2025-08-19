@@ -17,6 +17,7 @@ import CreateProduct from "./dashboard/Products/CreateProduct"
 import Createuser from "./dashboard/Authentication/Users/Createuser"
 import Edituser from "./dashboard/Authentication/Users/Edituser"
 import Managepermission from "./dashboard/Authentication/Managepermission"
+import PageNotFound from "./PageNotFound"
 const App = () => {
   return (
     <main>
@@ -27,6 +28,7 @@ const App = () => {
           <Route path="home" element={<Home/>}/>
           <Route path="about" element={<About/>}/>
           <Route path="login" element={<LoginPage/>}/>
+          <Route path="*" element={<PageNotFound/>}/>
         </Route>
 
          <Route path="/dashboard" element={<DashboardLayout/>}>
@@ -44,6 +46,7 @@ const App = () => {
           <Route path="categoryview/:id" element={<CategoryView/>}/>
           <Route path="products" element={<Products/>}/>
           <Route path="createproduct" element={<CreateProduct/>}/>
+          <Route path="*" element={<PageNotFound/>}/>
         </Route>
       </Routes>
       </BrowserRouter>

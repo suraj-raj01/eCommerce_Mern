@@ -96,8 +96,9 @@ export default function User() {
         // console.log(response.data.data,"search data")
         setPageCount(1)
       } else {
-        response = await axios.get(`${api}/users/getuser?page=${page}&limit=3`)
+        response = await axios.get(`${api}/users/getuser?page=${page}&limit=5`)
         setUser(response?.data?.data || [])
+        console.log(response.data.data);
         setPage(response.data.currentPage || page)
         setPageCount(response.data.pageCount || response.data.totalPages || 1)
       }

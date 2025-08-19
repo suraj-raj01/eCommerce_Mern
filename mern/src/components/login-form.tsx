@@ -5,7 +5,7 @@ import { Input } from "../components/ui/input"
 import { Label } from "../components/ui/label"
 import { useState } from "react"
 import axios from "axios"
-import { useNavigate } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import Swal from "sweetalert2"
 import api from "../API"
 
@@ -53,10 +53,10 @@ export function LoginForm({
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <Card className="overflow-hidden p-0">
+      <Card className="overflow-hidden mt-5 p-0">
         <CardContent className="grid p-0 md:grid-cols-2">
           <form onSubmit={handleSubmit} className="p-6 md:p-8">
-            <div className="flex flex-col gap-6">
+            <div className="flex flex-col gap-4">
               <div className="flex flex-col items-center text-center">
                 <h1 className="text-2xl font-bold">Welcome back</h1>
                 <p className="text-muted-foreground">Login to your Acme Inc account</p>
@@ -77,12 +77,12 @@ export function LoginForm({
               <div className="grid gap-3">
                 <div className="flex items-center">
                   <Label htmlFor="password">Password</Label>
-                  <a
-                    href="#"
-                    className="ml-auto text-sm underline-offset-2 hover:underline"
+                  <Link
+                    to="/forgot-password"
+                    className="ml-auto font-semibold text-sm underline-offset-2 hover:underline"
                   >
                     Forgot your password?
-                  </a>
+                  </Link>
                 </div>
                 <Input
                   id="password"
@@ -106,27 +106,27 @@ export function LoginForm({
                 </span>
               </div>
 
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-3 gap-4 text-white/50">
                 {/* Add onClick handlers to each button if needed */}
-                <Button variant="outline" type="button" className="w-full">
+                <Button variant="outline" type="button" className="w-full cursor-pointer">
                   {/* Apple Icon */}
-                  <span className="sr-only">Login with Apple</span>
+                  <span className=""> Apple</span>
                 </Button>
-                <Button variant="outline" type="button" className="w-full">
+                <Button variant="outline" type="button" className="w-full cursor-pointer">
                   {/* Google Icon */}
-                  <span className="sr-only">Login with Google</span>
+                  <span className="">Google</span>
                 </Button>
-                <Button variant="outline" type="button" className="w-full">
+                <Button variant="outline" type="button" className="w-full cursor-pointer">
                   {/* Meta Icon */}
-                  <span className="sr-only">Login with Meta</span>
+                  <span className=""> Meta</span>
                 </Button>
               </div>
 
               <div className="text-center text-sm">
                 Don&apos;t have an account?{' '}
-                <a href="#" className="underline underline-offset-4">
+                <Link to="/signup" className="underline underline-offset-4">
                   Sign up
-                </a>
+                </Link>
               </div>
             </div>
           </form>
@@ -134,7 +134,7 @@ export function LoginForm({
             <img
               src="/auth.png"
               alt="Image"
-              className=" flex items-center justify-center inset-0 h-auto w-full p-5 object-cover dark:brightness-[0.6]"
+              className=" flex items-center justify-center inset-0 h-auto w-full p-5 object-cover dark:brightness-[0.9]"
             />
           </div>
         </CardContent>

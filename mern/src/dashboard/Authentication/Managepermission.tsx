@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Button } from '../../components/ui/button'
-import { ChevronDown, ChevronUp, User, Loader2 } from 'lucide-react'
+import { ChevronDown, ChevronUp, User } from 'lucide-react'
 import { Badge } from '../../components/ui/badge'
 import { Checkbox } from "../../components/ui/checkbox"
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card"
@@ -12,6 +12,7 @@ import axios from 'axios'
 import api from '../../API'
 import Swal from 'sweetalert2'
 import { useNavigate } from 'react-router-dom'
+import { Skeleton } from '../../components/ui/skeleton'
 
 type Permission = {
   _id: string
@@ -32,7 +33,9 @@ export default function Roles() {
   const [roles, setRoles] = useState<Roles[]>([])
 
   const navigate = useNavigate();
-
+  const Allroles = () => {
+    navigate("/dashboard/roles")
+  }
   const [permissions, setPermissions] = useState<Permission[]>([])
   const [expandedRoles, setExpandedRoles] = useState<string[]>([])
   const [loading, setLoading] = useState(false)
@@ -144,31 +147,59 @@ export default function Roles() {
   }
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-full">
-        <Loader2 />
-      </div>
-    )
+    <Card>
+      <CardHeader>
+        {/* <CardTitle className="text-lg">Available Permissions</CardTitle> */}
+      </CardHeader>
+      <CardContent>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          {[...Array(6)].map((_, i) => (
+            <div
+              key={i}
+              className="p-3 border rounded-lg space-y-2 animate-pulse"
+            >
+              {/* Permission title */}
+              <Skeleton className="h-4 w-2/3" />
+
+              {/* Permission description */}
+              <Skeleton className="h-3 w-full" />
+              <Skeleton className="h-3 w-4/5" />
+
+              {/* Badge placeholder */}
+              <Skeleton className="h-5 w-16 rounded-full" />
+            </div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
   }
 
   return (
     <div className="p-2 sm:p-4 lg:p-6 space-y-4 sm:space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-2">
         <div>
-          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight">Role Management</h1>
-          <p className="text-sm text-muted-foreground">
-            Manage roles and permissions
-          </p>
+          {loading ? (
+            <>
+              <Skeleton className="h-9 w-32 mb-2" />
+              <Skeleton className="h-5 w-48" />
+            </>
+          ) : (
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Manage Permissions</h1>
+              <p className="text-sm sm:text-base text-muted-foreground">
+                Manage and track all the permissions
+              </p>
+            </div>
+          )}
         </div>
-        <Button
-          // onClick={handleCreateRole} 
-          onClick={() => { navigate('/dashboard/roles') }}
-          className="w-full sm:w-auto"
-        >
-          <User />
-          See All Roles
-        </Button>
+        {loading ? (
+          <Skeleton className="h-10 w-32" />
+        ) : (
+          <Button size="sm" onClick={Allroles} className="w-fit sm:w-auto">
+           <User/> See all Roles
+          </Button>
+        )}
       </div>
 
       {/* Create New Role Card */}

@@ -3,6 +3,31 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* Works in Chrome, Edge, Safari */
+::-webkit-scrollbar {
+  width: 10px;               /* width of vertical scrollbar */
+  height: 10px;              /* height of horizontal scrollbar */
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background);       /* scrollbar track */
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--foreground);          /* scrollbar thumb */
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--foreground-hover);          /* on hover */
+}
+
+/* Works in Firefox */
+* {
+  scrollbar-width: thin;     /* auto | thin | none */
+  scrollbar-color: var(--foreground) var(--background);  /* thumb color | track color */
+}
 
 
 
