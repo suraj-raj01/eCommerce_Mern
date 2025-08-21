@@ -21,4 +21,5 @@ route.delete("/deleteuser/:id",userController.deleteUser)
 route.post("/login",userController.userLogin)
 route.post("/verify-email",userController.verifyEmail)
 route.post("/forgot-password",userController.forgotPassword)
+route.post("/update-password",userController.updatePassword)
 module.exports = route;
