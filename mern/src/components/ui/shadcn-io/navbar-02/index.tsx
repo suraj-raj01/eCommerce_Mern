@@ -21,12 +21,15 @@ import {
 } from "../../../ui/dropdown-menu"
 import {
   Popover,
-  PopoverContent,
   PopoverTrigger,
 } from '../../../ui/popover';
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+} from "../../../ui/sheet"
 import { cn } from '../../../../lib/utils';
 import { Link, useNavigate } from 'react-router-dom';
-import { Label } from '../../label';
 import { Avatar, AvatarImage } from '../../avatar';
 import api from '../../../../API';
 import Swal from 'sweetalert2';
@@ -260,7 +263,7 @@ export const Navbar02 = React.forwardRef<HTMLElement, Navbar02Props>(
       <header
         ref={combinedRef}
         className={cn(
-          'sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-4 md:px-6 [&_*]:no-underline',
+          'sticky bg-red-500 top-0 z-50 w-full border-b  backdrop-blur supports-[backdrop-filter]:bg-background/60 px-4 md:px-6 [&_*]:no-underline',
           className
         )}
         {...props}
@@ -271,64 +274,73 @@ export const Navbar02 = React.forwardRef<HTMLElement, Navbar02Props>(
             {/* Mobile menu trigger */}
             {isMobile && (
               <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    className="group h-9 w-9 hover:bg-accent hover:text-accent-foreground"
-                    variant="ghost"
-                    size="icon"
-                  >
-                    <HamburgerIcon />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent align="center" className="min-w-80 ml-1">
-                  <NavigationMenu className="max-w-full flex-col items-start justify-start ">
-                    <NavigationMenuList className="flex-col items-start min-w-75 gap-0">
-                      {navigationLinks.map((link, index) => (
-                        <NavigationMenuItem key={index} className="w-full">
-                          {link.submenu ? (
-                            <>
-                              <div className="text-muted-foreground px-2 py-1.5 text-xs font-medium">
+
+                <Sheet>
+                  {/* Trigger button (hamburger icon) */}
+                  <SheetTrigger asChild>
+                    <PopoverTrigger asChild>
+                      <Button
+                        className="group h-9 w-9 hover:bg-accent hover:text-accent-foreground"
+                        variant="ghost"
+                        size="icon"
+                      >
+                        <HamburgerIcon />
+                      </Button>
+                    </PopoverTrigger>
+                  </SheetTrigger>
+
+                  {/* Sheet Content */}
+                  <SheetContent side="left" className="w-72 sm:w-80 p-4">
+                    <NavigationMenu orientation="vertical" className="w-full">
+                      <NavigationMenuList className="flex-col items-start w-full gap-0">
+                        {navigationLinks.map((link, index) => (
+                          <NavigationMenuItem key={index} className="w-full">
+                            {link.submenu ? (
+                              <>
+                                <div className="text-muted-foreground px-2 py-1.5 text-xs font-medium">
+                                  {link.label}
+                                </div>
+                                <ul className="w-full">
+                                  {link.items?.map((item, itemIndex) => (
+                                    <li key={itemIndex}>
+                                      <Link
+                                        to={item.href}
+                                        className="flex w-full items-center rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground cursor-pointer no-underline"
+                                      >
+                                        {item.label}
+                                      </Link>
+                                    </li>
+                                  ))}
+                                </ul>
+                              </>
+                            ) : (
+                              <span
+                                onClick={(e) => e.preventDefault()}
+                                className="flex w-full items-center rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground cursor-pointer no-underline"
+                              >
                                 {link.label}
-                              </div>
-                              <ul>
-                                {link.items?.map((item, itemIndex) => (
-                                  <li key={itemIndex}>
-                                    <Link
-                                      to={item.href}
-                                      className="flex w-full items-center rounded-md px-3 py-2 text-sm font-medium transition-colors cursor-pointer no-underline"
-                                    >
-                                      {item.label}
-                                    </Link>
-                                  </li>
-                                ))}
-                              </ul>
-                            </>
-                          ) : (
-                            <Label
-                              onClick={(e) => e.preventDefault()}
-                              className="flex w-full items-center rounded-md px-3 py-2 text-sm font-medium transition-colors cursor-pointer no-underline"
-                            >
-                              {link.label}
-                            </Label>
-                          )}
-                          {/* Add separator between different types of items */}
-                          {index < navigationLinks.length - 1 &&
-                            ((!link.submenu && navigationLinks[index + 1].submenu) ||
-                              (link.submenu && !navigationLinks[index + 1].submenu) ||
-                              (link.submenu &&
-                                navigationLinks[index + 1].submenu &&
-                                link.type !== navigationLinks[index + 1].type)) && (
-                              <div
-                                role="separator"
-                                aria-orientation="horizontal"
-                                className="bg-border -mx-1 my-1 h-px w-full"
-                              />
+                              </span>
                             )}
-                        </NavigationMenuItem>
-                      ))}
-                    </NavigationMenuList>
-                  </NavigationMenu>
-                </PopoverContent>
+
+                            {/* Separator logic */}
+                            {index < navigationLinks.length - 1 &&
+                              ((!link.submenu && navigationLinks[index + 1].submenu) ||
+                                (link.submenu && !navigationLinks[index + 1].submenu) ||
+                                (link.submenu &&
+                                  navigationLinks[index + 1].submenu &&
+                                  link.type !== navigationLinks[index + 1].type)) && (
+                                <div
+                                  role="separator"
+                                  aria-orientation="horizontal"
+                                  className="bg-border -mx-1 my-1 h-px w-full"
+                                />
+                              )}
+                          </NavigationMenuItem>
+                        ))}
+                      </NavigationMenuList>
+                    </NavigationMenu>
+                  </SheetContent>
+                </Sheet>
               </Popover>
             )}
             {/* Main nav */}
