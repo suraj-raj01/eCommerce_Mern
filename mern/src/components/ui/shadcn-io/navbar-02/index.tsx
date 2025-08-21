@@ -33,6 +33,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Avatar, AvatarImage } from '../../avatar';
 import api from '../../../../API';
 import Swal from 'sweetalert2';
+import { AvatarFallback } from '@radix-ui/react-avatar';
 // import type { ComponentProps } from 'react';
 
 // Simple logo component for the navbar
@@ -274,7 +275,6 @@ export const Navbar02 = React.forwardRef<HTMLElement, Navbar02Props>(
             {/* Mobile menu trigger */}
             {isMobile && (
               <Popover>
-
                 <Sheet>
                   {/* Trigger button (hamburger icon) */}
                   <SheetTrigger asChild>
@@ -290,7 +290,11 @@ export const Navbar02 = React.forwardRef<HTMLElement, Navbar02Props>(
                   </SheetTrigger>
 
                   {/* Sheet Content */}
-                  <SheetContent side="left" className="w-72 sm:w-80 p-4">
+                  <SheetContent side="left" className="w-80 sm:w-80 p-4">
+                    <Avatar>
+                      <AvatarImage src={`https://github.com/shadcn.png`} alt="@shadcn" />
+                      <AvatarFallback>CN</AvatarFallback>
+                    </Avatar>
                     <NavigationMenu orientation="vertical" className="w-full">
                       <NavigationMenuList className="flex-col items-start w-full gap-0">
                         {navigationLinks.map((link, index) => (

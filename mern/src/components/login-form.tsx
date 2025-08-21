@@ -44,7 +44,8 @@ export function LoginForm({
       });
       navigate("/dashboard")
     } catch (err: any) {
-      setError(err.message)
+      // console.log(err.response.data)
+      setError(err.response.data.message)
     } finally {
       setLoading(false)
     }
@@ -130,7 +131,7 @@ export function LoginForm({
               </div>
             </div>
           </form>
-          <div className="bg-muted relative flex items-center justify-center">
+          <div className="bg-transparent relative flex items-center justify-center">
             <img
               src="/auth.png"
               alt="Image"
