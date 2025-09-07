@@ -84,6 +84,14 @@ const data = {
         {
           title: "Sitesettings",
           url: "/dashboard/sitesettings",
+          icon: MonitorCog,
+          items:[
+            {
+              title:"Navbar",
+              url: '#',
+              icon: MonitorCog
+            }
+          ]
         },
         {
           title: "Manage Sitesetting",
@@ -101,12 +109,12 @@ const data = {
           url: "/dashboard/plans",
         },
         {
-          title: "Team",
-          url: "/dashboard/team",
+          title: "Plan Type",
+          url: "/dashboard/plantype",
         },
         {
-          title: "Billing",
-          url: "#",
+          title: "Biling Cycle",
+          url: "/dashboard/bilingcycle",
         },
         {
           title: "Limits",
@@ -153,7 +161,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
-              <Link to="#">
+              <Link to="/dashboard">
                 <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-md">
                   <LayoutDashboardIcon className="size-4" />
                 </div>

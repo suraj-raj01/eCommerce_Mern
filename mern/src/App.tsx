@@ -20,6 +20,13 @@ import Managepermission from "./dashboard/Authentication/Managepermission"
 import PageNotFound from "./PageNotFound"
 import { ForgetPassword } from "./Auth/ForgetPassword"
 import { ResetPassword } from "./Auth/ResetPassword"
+import PlanPage from "./dashboard/Products/plans/Plans"
+import CreatePlan from "./dashboard/Products/plans/CreatePlan"
+import PlanType from "./dashboard/Products/plantype/PlanType"
+import BilingCycle from "./dashboard/Products/bilingcycle/BilingCycle"
+import FileUpload from "./dashboard/image-handler/ImageUploader"
+import UpdatePlan from "./dashboard/Products/plans/UpdatePlan"
+import ViewPlan from "./dashboard/Products/plans/ViewPlan"
 const App = () => {
   return (
     <main>
@@ -49,6 +56,13 @@ const App = () => {
           <Route path="editcategory/:id" element={<EditCategory/>}/>
           <Route path="categoryview/:id" element={<CategoryView/>}/>
           <Route path="products" element={<Products/>}/>
+          <Route path="plans" element={<PlanPage/>}/>
+          <Route path="plans/edit/:id" element={<UpdatePlan/>}/>
+          <Route path="plans/view/:id" element={<ViewPlan/>}/>
+          <Route path="plantype" element={<PlanType/>}/>
+          <Route path="bilingcycle" element={<BilingCycle/>}/>
+          <Route path="image-handler" element={<FileUpload/>}/>
+          <Route path="createplan" element={<CreatePlan/>}/>
           <Route path="createproduct" element={<CreateProduct/>}/>
           <Route path="*" element={<PageNotFound/>}/>
         </Route>

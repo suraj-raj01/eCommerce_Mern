@@ -102,7 +102,7 @@ const Createuser = () => {
             console.log(res.data);
             setFormData({ name: '', email: '', password: '', roleId: '' });
             setProfileimg(null);
-             window.location.href = "/dashboard/user"; 
+            window.location.href = "/dashboard/user";
         } catch (error) {
             console.error("Error creating user:", error);
             // alert("Failed to create user");
@@ -189,6 +189,15 @@ const Createuser = () => {
                             onChange={handleFileChange}
                             required
                         />
+                        {profileimg && (
+                            <div className="mt-2">
+                                <img
+                                    src={URL.createObjectURL(profileimg)}
+                                    alt="Profile Preview"
+                                    className="w-24 h-24 object-cover rounded-full border"
+                                />
+                            </div>
+                        )}
                     </div>
 
                     <div className="grid gap-2">
@@ -208,8 +217,8 @@ const Createuser = () => {
 
                     </div>
 
-                    <Button type="submit" variant="default">
-                        Submit
+                    <Button type="submit" variant="default" disabled={loading}>
+                        {loading?'Creating ....':'✅Create User'}
                     </Button>
                 </form>
             </div>
