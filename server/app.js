@@ -43,7 +43,7 @@ app.use("/api/permission", permissionRoute);
 app.use("/api/users", userRoute);
 app.use("/api/category", productCategoryRoute);
 app.use("/api/uploads", express.static(path.join(__dirname, "uploads"))); // if storing local files
-app.use("/api/chat", chatbotRoutes);
+app.use("/api", chatbotRoutes);
 app.use("/api/uploadcloudinary", uploadRoutes);
 app.use("/api/billingcycle", bilingCycle);
 app.use("/api/plantype", planType);
