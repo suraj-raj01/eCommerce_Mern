@@ -4,6 +4,7 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const path = require("path");
 require("@dotenvx/dotenvx").config();
+// import connectDB from "./config/db";
 
 const app = express();
 
@@ -21,6 +22,7 @@ mongoose
   .connect(Database, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log("✅ Database Connected Successfully!"))
   .catch((err) => console.error("❌ Database connection failed:", err.message));
+// connectDB();
 
 // Import routes
 const roleRoute = require("./routes/authentication/roles");
@@ -31,11 +33,63 @@ const chatbotRoutes = require("./routes/chat/chatbotRoutes");
 const uploadRoutes = require("./routes/products/upload");
 const bilingCycle = require("./routes/products/billingcycle")
 const planType = require("./routes/products/plantype")
-const plans = require("./routes/products/plans")
+const plans = require("./routes/products/plans");
+// const Products = require('./routes/products/product')
 // Root route
 app.get("/", (req, res) => {
-  res.send("Hello, this is the Server Page");
+  res.send(`
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Server Status</title>
+      <style>
+        body {
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+          background: linear-gradient(135deg, #6b73ff, #000dff);
+          color: white;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          height: 100vh;
+          margin: 0;
+        }
+        .container {
+          text-align: center;
+          padding: 40px 60px;
+          background: rgba(0, 0, 0, 0.3);
+          border-radius: 20px;
+          box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+        }
+        h1 {
+          font-size: 2.5rem;
+          margin-bottom: 10px;
+        }
+        p {
+          font-size: 1.2rem;
+        }
+        span.rocket {
+          font-size: 2rem;
+          display: inline-block;
+          animation: bounce 1.5s infinite;
+        }
+        @keyframes bounce {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-10px); }
+        }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <h1>Server is Running!</h1>
+        <p>Port: <strong>${PORT}</strong> <span class="rocket">🚀</span></p>
+      </div>
+    </body>
+    </html>
+  `);
 });
+
 
 // Mount routes
 app.use("/api/roles", roleRoute);
@@ -48,6 +102,7 @@ app.use("/api/uploadcloudinary", uploadRoutes);
 app.use("/api/billingcycle", bilingCycle);
 app.use("/api/plantype", planType);
 app.use("/api/plans", plans);
+// app.use("/api/product", Products);
 
 // 404 Handler
 app.use((req, res) => {

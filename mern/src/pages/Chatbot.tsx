@@ -157,7 +157,7 @@ export default function ChatUI() {
   };
 
   return (
-    <div className="max-w-md mx-auto p-2 h-150 mt-5 flex flex-col">
+    <div className="w-full md:w-4xl mx-auto p-2 h-150 mt-5 flex flex-col">
       <Card className="flex-1 flex flex-col overflow-x-auto scroll-ms-0.5 scroll-auto border-2 bg-background">
         <CardHeader className="border-b sticky pt-4 -top-6 z-10 bg-background">
           <CardTitle className="flex items-center gap-3 sm:text-xs">
@@ -226,7 +226,7 @@ export default function ChatUI() {
                     }`}
                   >
                     <div
-                      className={`overflow-x-auto p-2 rounded-md border text-xs ${
+                      className={`text-wrap w-full p-2 rounded-md border text-xs ${
                         message.role === "user"
                           ? "rounded-tr-sm"
                           : "rounded-tl-sm"
