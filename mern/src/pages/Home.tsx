@@ -1,9 +1,9 @@
-import ChatUI from "./Chatbot"
+import ChatbotLauncher from "../chatbots/ChatbotTrigger"
 
 const Home = () => {
   return (
     <section>
-      <ChatUI/>
+      <ChatbotLauncher/>
     </section>
   )
 }

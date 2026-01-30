@@ -357,11 +357,11 @@ export const Navbar02 = React.forwardRef<HTMLElement, Navbar02Props>(
                 <div className="text-2xl">
                   {logo}
                 </div>
-                <span className="hidden font-bold text-xl sm:inline-block">shadcn.io</span>
+                <span className="hidden font-bold text-xl sm:inline-block">Shopying</span>
               </Button>
               {/* Navigation menu */}
               {!isMobile && (
-                <NavigationMenu className="flex">
+                <NavigationMenu className="flex w-full">
                   <NavigationMenuList className="gap-1">
                     {navigationLinks.map((link, index) => (
                       <NavigationMenuItem key={index}>
@@ -370,78 +370,77 @@ export const Navbar02 = React.forwardRef<HTMLElement, Navbar02Props>(
                             <NavigationMenuTrigger>
                               {link.label}
                             </NavigationMenuTrigger>
-                            <NavigationMenuContent>
+                            <NavigationMenuContent
+                              className="relative left-0 top-6 w-full h-[calc(100vh-64px)] max-w-none rounded-none border-none overflow-auto z-50"
+                            >
+
                               {link.type === 'description' && link.label === 'Features' ? (
-                                <div className="grid gap-3 p-4 md:w-[400px] lg:w-[800px] h-auto lg:grid-cols-[.75fr_1fr]">
+                                <div className="grid gap-3 p-6 w-full h-full">
                                   <div className="row-span-3">
                                     <NavigationMenuLink asChild>
                                       <Button
                                         onClick={(e) => e.preventDefault()}
-                                        className="flex h-full w-full select-none flex-col justify-center items-center text-center rounded-sm bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md cursor-pointer"
+                                        className="flex h-full w-full flex-col justify-center items-center text-center bg-muted p-6"
                                       >
-                                        <div className="mb-3 text-xl text-foreground font-medium">
+                                        <div className="mb-3 text-xl font-medium">
                                           shadcn.io
                                         </div>
-                                        <p className="text-sm leading-tight text-muted-foreground">
+                                        <p className="text-sm text-muted-foreground">
                                           Beautifully designed components built with Radix UI and Tailwind CSS.
                                         </p>
                                       </Button>
                                     </NavigationMenuLink>
                                   </div>
-                                  {link.items?.map((item, itemIndex) => (
-                                    <Link
-                                      key={itemIndex}
-                                      title={item.label}
-                                      to={item.href}
-                                      type={link.type}
-                                    >
-                                      <h1 className='font-bold'>{item.label}</h1>
+
+                                  {link.items?.map((item, i) => (
+                                    <Link key={i} to={item.href}>
+                                      <h1 className="font-bold">{item.label}</h1>
                                       {item.description}
                                     </Link>
                                   ))}
                                 </div>
                               ) : link.type === 'simple' ? (
-                                <div className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[800px]">
-                                  {link.items?.map((item, itemIndex) => (
-                                    <Link
-                                      key={itemIndex}
-                                      title={item.label}
-                                      to={item.href}
-                                      type={link.type}
-                                    >
-                                      <h1 className='font-bold'>{item.label}</h1>
-                                      {item.description}
-                                    </Link>
-                                  ))}
-                                </div>
+                              <div className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[800px]">
+                                {link.items?.map((item, itemIndex) => (
+                                  <Link
+                                    key={itemIndex}
+                                    title={item.label}
+                                    to={item.href}
+                                    type={link.type}
+                                  >
+                                    <h1 className='font-bold'>{item.label}</h1>
+                                    {item.description}
+                                  </Link>
+                                ))}
+                              </div>
                               ) : link.type === 'icon' ? (
-                                <div className="grid w-[400px] lg:w-[800px]">
-                                  {link.items?.map((item, itemIndex) => (
-                                    <Link
-                                      key={itemIndex}
-                                      title={item.label}
-                                      to={item.href}
-                                      type={link.type}
-                                      className='flex items-start justify-start space-x-3'
-                                    >
-                                      {item.label} <br />
-                                      {item.description}
-                                    </Link>
-                                  ))}
-                                </div>
+                              <div className="grid w-[400px] lg:w-[800px]">
+                                {link.items?.map((item, itemIndex) => (
+                                  <Link
+                                    key={itemIndex}
+                                    title={item.label}
+                                    to={item.href}
+                                    type={link.type}
+                                    className='flex items-start justify-start space-x-3'
+                                  >
+                                    {item.label} <br />
+                                    {item.description}
+                                  </Link>
+                                ))}
+                              </div>
                               ) : (
-                                <div className="grid gap-3 p-4">
-                                  {link.items?.map((item, itemIndex) => (
-                                    <Link
-                                      key={itemIndex}
-                                      title={item.label}
-                                      to={item.href}
-                                      type={link.type}
-                                    >
-                                      {item.description}
-                                    </Link>
-                                  ))}
-                                </div>
+                              <div className="grid gap-3 p-4">
+                                {link.items?.map((item, itemIndex) => (
+                                  <Link
+                                    key={itemIndex}
+                                    title={item.label}
+                                    to={item.href}
+                                    type={link.type}
+                                  >
+                                    {item.description}
+                                  </Link>
+                                ))}
+                              </div>
                               )}
                             </NavigationMenuContent>
                           </>

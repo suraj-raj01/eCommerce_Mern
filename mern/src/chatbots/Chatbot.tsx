@@ -157,9 +157,9 @@ export default function ChatUI() {
   };
 
   return (
-    <div className="w-full md:w-4xl mx-auto p-2 h-150 mt-5 flex flex-col">
-      <Card className="flex-1 flex flex-col overflow-x-auto scroll-ms-0.5 scroll-auto border-2 bg-background">
-        <CardHeader className="border-b sticky pt-4 -top-6 z-10 bg-background">
+    <div className="w-full max-w-5xl mx-auto h-[100dvh] md:h-[80vh] flex flex-col p-3">
+      <Card className="flex flex-col h-full border bg-background overflow-hidden">
+        <CardHeader className="border-b sticky top-0 z-10 bg-background px-3 py-2">
           <CardTitle className="flex items-center gap-3 sm:text-xs">
             <div className="p-2 rounded-full border">
               <Bot className="w-5 h-5" />
@@ -192,7 +192,7 @@ export default function ChatUI() {
         </CardHeader>
 
         <CardContent className="flex-1 flex flex-col p-0 min-h-0">
-          <ScrollArea className="flex-1 p-2">
+          <ScrollArea className="flex-1 px-2 py-3">
             <div className="space-y-2">
               {messages.map((message, index) => (
                 <div
@@ -226,7 +226,7 @@ export default function ChatUI() {
                     }`}
                   >
                     <div
-                      className={`text-wrap w-full p-2 rounded-md border text-xs ${
+                      className={`max-w-[100%] sm:max-w-[100%] p-2 rounded-md border text-xs break-words ${
                         message.role === "user"
                           ? "rounded-tr-sm"
                           : "rounded-tl-sm"
@@ -261,7 +261,7 @@ export default function ChatUI() {
             </div>
           </ScrollArea>
 
-          <div className="border-t p-2">
+          <div className="border-t p-2 sticky bottom-0 bg-background">
             <div className="flex gap-2 items-end">
               <div className="flex-1 relative">
                 <Input
@@ -270,7 +270,7 @@ export default function ChatUI() {
                   onKeyPress={handleKeyPress}
                   placeholder="Type your message..."
                   disabled={isLoading}
-                  className="min-h-[36px] resize-none text-sm"
+                  className="min-h-[40px] text-sm md:text-base"
                 />
               </div>
               <Button
